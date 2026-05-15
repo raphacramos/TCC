@@ -61,67 +61,71 @@ def rodar_pipeline_kmeans():
         return
         
     distancias = [400, 800, 1500]
-    K_CLUSTERS = 4 # Modificado para identificar MAIS do que 3 estratégias
+    tipos_piscina = ['Long Course', 'Short Course']
+    K_CLUSTERS = 4 
     
-    fig, axes = plt.subplots(3, 1, figsize=(12, 18))
+    fig, axes = plt.subplots(3, 2, figsize=(20, 18))
     todos_resultados = []
     
     for i, dist in enumerate(distancias):
-        print(f"\n>>> Processando prova de {dist}m...")
-        df_dist = df[df['distancia_prova'] == dist].copy()
-        
-        if df_dist.empty:
-            print(f"Nenhum dado para {dist}m.")
-            continue
+        for j, tipo in enumerate(tipos_piscina):
+            print(f"\n>>> Processando prova de {dist}m ({tipo})...")
+            df_dist = df[(df['distancia_prova'] == dist) & (df['tipo_piscina'] == tipo)].copy()
+            ax = axes[i, j]
             
-        df_dist['id_performance'] = df_dist['atleta'] + " (" + df_dist['genero'] + " " + df_dist['fase'] + ")"
-        df_pivot = df_dist.pivot(index='id_performance', columns='distancia_parcial', values='velocidade_relativa')
-        df_pivot = df_pivot.dropna()
-        
-        if df_pivot.shape[0] < K_CLUSTERS:
-            print(f"Performances válidas ({df_pivot.shape[0]}) menores que K={K_CLUSTERS}. Pulando.")
-            continue
+            if df_dist.empty:
+                print(f"Nenhum dado para {dist}m em {tipo}.")
+                ax.set_visible(False)
+                continue
+                
+            df_dist['id_performance'] = df_dist['campeonato'] + " | " + df_dist['atleta'] + " (" + df_dist['genero'] + " " + df_dist['fase'] + ")"
+            df_pivot = df_dist.pivot(index='id_performance', columns='distancia_parcial', values='velocidade_relativa')
+            df_pivot = df_pivot.dropna()
             
-        print(f"Dados Pivotados: {df_pivot.shape[0]} atletas | Features: {df_pivot.shape[1]} parciais.")
-        
-        # Treinando K-Means (K=4)
-        kmeans = KMeans(n_clusters=K_CLUSTERS, random_state=42, n_init='auto')
-        df_pivot['Cluster'] = kmeans.fit_predict(df_pivot)
-        
-        # Analisando Centroides e Rotulando
-        centroides = df_pivot.groupby('Cluster').mean()
-        mapa_estrategias = rotular_estrategias_dinamicamente(centroides, K_CLUSTERS)
-        df_pivot['Estrategia_Pacing'] = df_pivot['Cluster'].map(mapa_estrategias)
-        
-        # Guardando para o CSV global
-        df_resultados = df_pivot.reset_index()
-        df_resultados.insert(1, 'Prova', f"{dist}m Livre") # Identificador visual
-        todos_resultados.append(df_resultados)
-        
-        # Plotando (1 subplot por distância)
-        ax = axes[i]
-        cores = sns.color_palette("Set1", K_CLUSTERS) # Paleta com mais cores
-        
-        for c_idx, cluster_id in enumerate(centroides.index):
-            qtd_atletas = sum(df_pivot["Cluster"] == cluster_id)
-            nome_estrategia = mapa_estrategias[cluster_id]
+            if df_pivot.shape[0] < K_CLUSTERS:
+                print(f"Performances válidas ({df_pivot.shape[0]}) menores que K={K_CLUSTERS}. Pulando.")
+                ax.set_visible(False)
+                continue
+                
+            print(f"Dados Pivotados: {df_pivot.shape[0]} atletas | Features: {df_pivot.shape[1]} parciais.")
             
-            sns.lineplot(
-                x=centroides.columns, 
-                y=centroides.loc[cluster_id], 
-                marker='o', 
-                label=f'{nome_estrategia} (N={qtd_atletas})',
-                linewidth=2.5,
-                color=cores[c_idx],
-                ax=ax
-            )
+            # Treinando K-Means (K=4)
+            kmeans = KMeans(n_clusters=K_CLUSTERS, random_state=42, n_init='auto')
+            df_pivot['Cluster'] = kmeans.fit_predict(df_pivot)
             
-        ax.axhline(y=100, color='black', linestyle='--', label='Baseline (100%)', alpha=0.5)
-        ax.set_title(f'K-Means (K={K_CLUSTERS}) - Estratégias na prova de {dist}m Livre', fontsize=14)
-        ax.set_xlabel('Distância Parcial (m)', fontsize=11)
-        ax.set_ylabel('Velocidade Relativa (%)', fontsize=11)
-        ax.legend(title='Estratégia Identificada', bbox_to_anchor=(1.02, 1), loc='upper left')
-        ax.grid(True, linestyle=':', alpha=0.7)
+            # Analisando Centroides e Rotulando
+            centroides = df_pivot.groupby('Cluster').mean()
+            mapa_estrategias = rotular_estrategias_dinamicamente(centroides, K_CLUSTERS)
+            df_pivot['Estrategia_Pacing'] = df_pivot['Cluster'].map(mapa_estrategias)
+            
+            # Guardando para o CSV global
+            df_resultados = df_pivot.reset_index()
+            df_resultados.insert(1, 'Prova', f"{dist}m Livre ({tipo})")
+            todos_resultados.append(df_resultados)
+            
+            # Plotando no grid 3x2
+            cores = sns.color_palette("Set1", K_CLUSTERS) 
+            
+            for c_idx, cluster_id in enumerate(centroides.index):
+                qtd_atletas = sum(df_pivot["Cluster"] == cluster_id)
+                nome_estrategia = mapa_estrategias[cluster_id]
+                
+                sns.lineplot(
+                    x=centroides.columns, 
+                    y=centroides.loc[cluster_id], 
+                    marker='o', 
+                    label=f'{nome_estrategia} (N={qtd_atletas})',
+                    linewidth=2.5,
+                    color=cores[c_idx],
+                    ax=ax
+                )
+                
+            ax.axhline(y=100, color='black', linestyle='--', label='Baseline (100%)', alpha=0.5)
+            ax.set_title(f'{dist}m Livre - {tipo}', fontsize=15)
+            ax.set_xlabel('Distância Parcial (m)', fontsize=11)
+            ax.set_ylabel('Velocidade Relativa (%)', fontsize=11)
+            ax.legend(title='Estratégia Identificada', bbox_to_anchor=(1.02, 1), loc='upper left')
+            ax.grid(True, linestyle=':', alpha=0.7)
 
     plt.tight_layout()
     plt.savefig('kmeans_pacing_todas_distancias.png', dpi=300)

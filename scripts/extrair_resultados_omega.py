@@ -1,6 +1,9 @@
 import pdfplumber
 import pandas as pd
+import numpy as np
 import re
+import os
+import glob
 import matplotlib.pyplot as plt
 import seaborn as sns
 from typing import List, Dict, Optional
@@ -77,6 +80,7 @@ def extrair_dados_pdf_escalavel(caminho_pdf: str) -> List[Dict]:
                 if match_atleta:
                     rank, heat_opcional, lane, nome, nat, rt_opcional, tempo_final = match_atleta.groups()
                     nadador_atual = {
+                        "campeonato": os.path.basename(caminho_pdf).replace('.pdf', ''),
                         "genero": contexto["genero"],
                         "distancia_prova": contexto["distancia_prova"],
                         "fase": contexto["fase"],
@@ -117,6 +121,7 @@ def transformar_e_calcular_features(dados_brutos: List[Dict]) -> pd.DataFrame:
             
         for dist, tempo_str in d['parciais'].items():
             linhas_long.append({
+                "campeonato": d["campeonato"],
                 "genero": d["genero"],
                 "distancia_prova": d["distancia_prova"],
                 "fase": d["fase"],
@@ -132,7 +137,7 @@ def transformar_e_calcular_features(dados_brutos: List[Dict]) -> pd.DataFrame:
     
     # Ordenação estrita por evento e por trecho
     df_long = df_long.sort_values(
-        by=['genero', 'distancia_prova', 'fase', 'atleta', 'distancia_parcial']
+        by=['campeonato', 'genero', 'distancia_prova', 'fase', 'atleta', 'distancia_parcial']
     ).reset_index(drop=True)
     
     # Conversões
@@ -140,21 +145,28 @@ def transformar_e_calcular_features(dados_brutos: List[Dict]) -> pd.DataFrame:
     df_long['tempo_final_seg'] = df_long['tempo_final_str'].apply(converte_para_segundos)
     
     # Cálculo Vetorizado do Delta de cada Parcial (Agrupado por Evento/Atleta)
-    agrupamento = ['genero', 'distancia_prova', 'fase', 'atleta']
+    agrupamento = ['campeonato', 'genero', 'distancia_prova', 'fase', 'atleta']
+    
     df_long['tempo_parcial_seg'] = df_long.groupby(agrupamento)['tempo_acumulado_seg'].diff()
     df_long['tempo_parcial_seg'] = df_long['tempo_parcial_seg'].fillna(df_long['tempo_acumulado_seg'])
+    
+    df_long['distancia_trecho'] = df_long.groupby(agrupamento)['distancia_parcial'].diff()
+    df_long['distancia_trecho'] = df_long['distancia_trecho'].fillna(df_long['distancia_parcial'])
     
     # Engenharia de Features (Fórmulas Esportivas de Pacing)
     df_long['percentual_tempo'] = (df_long['tempo_parcial_seg'] / df_long['tempo_final_seg']) * 100
     
-    comprimento_piscina = 50.0
-    df_long['velocidade_trecho'] = comprimento_piscina / df_long['tempo_parcial_seg']
+    df_long['velocidade_trecho'] = df_long['distancia_trecho'] / df_long['tempo_parcial_seg']
     df_long['velocidade_media'] = df_long['distancia_prova'] / df_long['tempo_final_seg']
     df_long['velocidade_relativa'] = (df_long['velocidade_trecho'] / df_long['velocidade_media']) * 100
     
+    # Identificação Automática do Tamanho da Piscina
+    # Se o menor trecho de um atleta for 25m, é Short Course (SC). Senão, é Long Course (LC).
+    df_long['tipo_piscina'] = np.where(df_long.groupby(agrupamento)['distancia_trecho'].transform('min') <= 25, 'Short Course', 'Long Course')
+    
     # Filtragem das colunas requeridas pelo usuário
     colunas_finais = [
-        'genero', 'distancia_prova', 'fase', 'atleta', 'nacionalidade', 
+        'campeonato', 'tipo_piscina', 'genero', 'distancia_prova', 'fase', 'atleta', 'nacionalidade', 
         'distancia_parcial', 'tempo_acumulado_seg', 'tempo_parcial_seg', 
         'percentual_tempo', 'velocidade_relativa'
     ]
@@ -213,12 +225,20 @@ def plotar_eda_dupla(df: pd.DataFrame):
     print(">>> 4. EDA: Gráfico salvo em 'eda_pacing_completo.png'")
 
 def main():
-    caminho_arquivo_pdf = "../pdfs_omega/mundial_singapura_2025.pdf"
+    arquivos_pdf = glob.glob("../pdfs_omega/**/*.pdf", recursive=True)
+    if not arquivos_pdf:
+        print("Nenhum arquivo PDF encontrado na pasta '../pdfs_omega/'")
+        return
     
-    print(">>> 1. Iniciando Extração Escalável com State Machine...")
-    dados_extraidos = extrair_dados_pdf_escalavel(caminho_arquivo_pdf)
+    print(f">>> 1. Iniciando Extração Escalável em Lote ({len(arquivos_pdf)} arquivos encontrados)...")
+    dados_extraidos = []
     
-    print(f">>> 2. Transformando dados extraídos...")
+    for caminho in arquivos_pdf:
+        print(f"Lendo: {os.path.basename(caminho)}...")
+        dados = extrair_dados_pdf_escalavel(caminho)
+        dados_extraidos.extend(dados)
+    
+    print(f"\n>>> 2. Transformando dados extraídos de todos os arquivos...")
     df_etl = transformar_e_calcular_features(dados_extraidos)
     
     if not df_etl.empty:
