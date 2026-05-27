@@ -13,7 +13,7 @@ def converte_para_segundos(tempo_str: str) -> float:
     Converte uma string de tempo ('mm:ss.cc', 'ss.cc', ou 'hh:mm:ss.cc') para segundos (float).
     """
     try:
-        if not tempo_str or pd.isna(tempo_str) or tempo_str in ['DSQ', 'DNS']:
+        if not tempo_str or pd.isna(tempo_str) or tempo_str in ['DSQ', 'DNS']: ## desclassificado ou nao largou
             return 0.0
             
         tempo_str = str(tempo_str).strip()
@@ -21,8 +21,8 @@ def converte_para_segundos(tempo_str: str) -> float:
             partes = tempo_str.split(':')
             if len(partes) == 2: # mm:ss.cc
                 return float(partes[0]) * 60 + float(partes[1])
-            elif len(partes) == 3: # hh:mm:ss.cc (Raro, mas possível em maratonas aquáticas)
-                return float(partes[0]) * 3600 + float(partes[1]) * 60 + float(partes[2])
+           ## elif len(partes) == 3: # hh:mm:ss.cc (Raro, mas possível em maratonas aquáticas)
+           ##     return float(partes[0]) * 3600 + float(partes[1]) * 60 + float(partes[2])
         return float(tempo_str)
     except Exception as e:
         print(f"Erro ao converter tempo '{tempo_str}': {e}")
@@ -81,9 +81,11 @@ def extrair_dados_pdf_escalavel(caminho_pdf: str) -> List[Dict]:
                     rank, heat_opcional, lane, nome, nat, rt_opcional, tempo_final = match_atleta.groups()
                     nadador_atual = {
                         "campeonato": os.path.basename(caminho_pdf).replace('.pdf', ''),
+                        "tipo_piscina": "Short Course" if "curta" in caminho_pdf.lower() else "Long Course",
                         "genero": contexto["genero"],
                         "distancia_prova": contexto["distancia_prova"],
                         "fase": contexto["fase"],
+                        "rank": int(rank) if rank and rank.isdigit() else 999,
                         "atleta": nome.strip(),
                         "nacionalidade": nat,
                         "tempo_final": tempo_final,
@@ -122,9 +124,11 @@ def transformar_e_calcular_features(dados_brutos: List[Dict]) -> pd.DataFrame:
         for dist, tempo_str in d['parciais'].items():
             linhas_long.append({
                 "campeonato": d["campeonato"],
+                "tipo_piscina": d["tipo_piscina"],
                 "genero": d["genero"],
                 "distancia_prova": d["distancia_prova"],
                 "fase": d["fase"],
+                "rank": d["rank"],
                 "atleta": d["atleta"],
                 "nacionalidade": d["nacionalidade"],
                 "distancia_parcial": dist,
@@ -137,7 +141,7 @@ def transformar_e_calcular_features(dados_brutos: List[Dict]) -> pd.DataFrame:
     
     # Ordenação estrita por evento e por trecho
     df_long = df_long.sort_values(
-        by=['campeonato', 'genero', 'distancia_prova', 'fase', 'atleta', 'distancia_parcial']
+        by=['campeonato', 'tipo_piscina', 'genero', 'distancia_prova', 'fase', 'atleta', 'distancia_parcial']
     ).reset_index(drop=True)
     
     # Conversões
@@ -145,7 +149,7 @@ def transformar_e_calcular_features(dados_brutos: List[Dict]) -> pd.DataFrame:
     df_long['tempo_final_seg'] = df_long['tempo_final_str'].apply(converte_para_segundos)
     
     # Cálculo Vetorizado do Delta de cada Parcial (Agrupado por Evento/Atleta)
-    agrupamento = ['campeonato', 'genero', 'distancia_prova', 'fase', 'atleta']
+    agrupamento = ['campeonato', 'tipo_piscina', 'genero', 'distancia_prova', 'fase', 'atleta']
     
     df_long['tempo_parcial_seg'] = df_long.groupby(agrupamento)['tempo_acumulado_seg'].diff()
     df_long['tempo_parcial_seg'] = df_long['tempo_parcial_seg'].fillna(df_long['tempo_acumulado_seg'])
@@ -160,13 +164,12 @@ def transformar_e_calcular_features(dados_brutos: List[Dict]) -> pd.DataFrame:
     df_long['velocidade_media'] = df_long['distancia_prova'] / df_long['tempo_final_seg']
     df_long['velocidade_relativa'] = (df_long['velocidade_trecho'] / df_long['velocidade_media']) * 100
     
-    # Identificação Automática do Tamanho da Piscina
-    # Se o menor trecho de um atleta for 25m, é Short Course (SC). Senão, é Long Course (LC).
-    df_long['tipo_piscina'] = np.where(df_long.groupby(agrupamento)['distancia_trecho'].transform('min') <= 25, 'Short Course', 'Long Course')
+    # Criacao da Variavel Alvo: Medalhista (Apenas Finais, Top 3)
+    df_long['medalhista'] = (df_long['fase'].str.lower() == 'final') & (df_long['rank'] <= 3)
     
     # Filtragem das colunas requeridas pelo usuário
     colunas_finais = [
-        'campeonato', 'tipo_piscina', 'genero', 'distancia_prova', 'fase', 'atleta', 'nacionalidade', 
+        'campeonato', 'tipo_piscina', 'genero', 'distancia_prova', 'fase', 'rank', 'medalhista', 'atleta', 'nacionalidade', 
         'distancia_parcial', 'tempo_acumulado_seg', 'tempo_parcial_seg', 
         'percentual_tempo', 'velocidade_relativa'
     ]
@@ -229,30 +232,53 @@ def main():
     if not arquivos_pdf:
         print("Nenhum arquivo PDF encontrado na pasta '../pdfs_omega/'")
         return
+        
+    arquivo_saida_csv = "dataset_pacing_completo.csv"
+    campeonatos_processados = set()
+    df_antigo = None
     
-    print(f">>> 1. Iniciando Extração Escalável em Lote ({len(arquivos_pdf)} arquivos encontrados)...")
+    if os.path.exists(arquivo_saida_csv):
+        df_antigo = pd.read_csv(arquivo_saida_csv)
+        campeonatos_processados = set(df_antigo['campeonato'].unique())
+        print(f">>> Modo Incremental Ativo: O CSV atual tem {len(campeonatos_processados)} campeonatos. Eles serão ignorados no parsing.")
+    
+    novos_pdfs = []
+    for caminho in arquivos_pdf:
+        nome_camp = os.path.basename(caminho).replace('.pdf', '')
+        if nome_camp not in campeonatos_processados:
+            novos_pdfs.append(caminho)
+            
+    if not novos_pdfs:
+        print(">>> Nenhum PDF novo encontrado. Todos já estão no CSV!")
+        if df_antigo is not None and not df_antigo.empty:
+            plotar_eda_dupla(df_antigo)
+        return
+    
+    print(f">>> 1. Iniciando Extração Escalável ({len(novos_pdfs)} arquivos novos)...")
     dados_extraidos = []
     
-    for caminho in arquivos_pdf:
+    for caminho in novos_pdfs:
         print(f"Lendo: {os.path.basename(caminho)}...")
         dados = extrair_dados_pdf_escalavel(caminho)
         dados_extraidos.extend(dados)
     
-    print(f"\n>>> 2. Transformando dados extraídos de todos os arquivos...")
+    print(f"\n>>> 2. Transformando dados novos extraídos...")
     df_etl = transformar_e_calcular_features(dados_extraidos)
     
     if not df_etl.empty:
-        print("\n>>> Pipeline ETL Consolidado: Visualização do Long Format:")
-        print(df_etl.head(10).to_string(index=False))
-        
+        if df_antigo is not None and not df_antigo.empty:
+            df_final = pd.concat([df_antigo, df_etl], ignore_index=True)
+            print(">>> Merge com o histórico antigo realizado com sucesso.")
+        else:
+            df_final = df_etl
+            
         print("\n>>> 3. Exportando (Load)...")
-        arquivo_saida_csv = "dataset_pacing_completo.csv"
-        df_etl.to_csv(arquivo_saida_csv, index=False)
-        print(f"Dataset consolidado para Banco de Dados gerado: '{arquivo_saida_csv}'")
+        df_final.to_csv(arquivo_saida_csv, index=False)
+        print(f"Dataset atualizado: '{arquivo_saida_csv}'")
         
-        plotar_eda_dupla(df_etl)
+        plotar_eda_dupla(df_final)
     else:
-        print("Nenhum dado válido foi extraído ou transformado.")
+        print("Nenhum dado válido foi extraído dos PDFs novos.")
 
 if __name__ == "__main__":
     main()
