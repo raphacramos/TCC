@@ -28,6 +28,15 @@ def converte_para_segundos(tempo_str: str) -> float:
         print(f"Erro ao converter tempo '{tempo_str}': {e}")
         return 0.0
 
+def obter_nome_campeonato(caminho_pdf: str) -> str:
+    """
+    Retorna um nome único para o campeonato baseado na pasta pai e no nome do arquivo.
+    Isso evita colisões de arquivos com o mesmo nome em subpastas diferentes.
+    """
+    pasta_pai = os.path.basename(os.path.dirname(caminho_pdf))
+    nome_base = os.path.basename(caminho_pdf).replace('.pdf', '')
+    return f"{pasta_pai}_{nome_base}"
+
 def extrair_contexto_pagina(texto_pagina: str) -> Optional[Dict]:
     """
     State Machine (Contexto):
@@ -51,8 +60,8 @@ def extrair_dados_pdf_escalavel(caminho_pdf: str) -> List[Dict]:
     Itera por todas as páginas do PDF, identificando o contexto da prova e extraindo
     dinamicamente as parciais empilhadas (400m, 800m, 1500m).
     """
-    # Regex 1: Identifica a linha inicial do atleta (suporta Formato Heats com Data de Nascimento e Heat Number)
-    padrao_atleta = re.compile(r'^(\d+)\s+(?:(\d+)\s+)?(\d+)\s+([A-Za-z\s\-\']+?)\s+([A-Z]{3})\s+(?:\d{1,2}\s+[A-Z]{3}\s+\d{4}\s+)?([\d.]+)?\s*([\d:.]+|DSQ|DNS)')
+    # Regex 1: Identifica a linha inicial do atleta (suporta Formato Heats com Data de Nascimento/Ano e Heat Number)
+    padrao_atleta = re.compile(r'^(\d+)\s+(?:(\d+)\s+)?(\d+)\s+([A-Za-z\s\-\'\.]+?)\s+(?:\d{4}\s+)?([A-Z]{3})\s+(?:\d{1,2}\s+[A-Z]{3}\s+\d{4}\s+)?([\d.]+)?\s*([\d:.]+|DSQ|DNS)')
     
     # Regex 2: Captura qualquer padrão de split na linha (Com ou sem posição entre parênteses)
     padrao_parciais = re.compile(r'(\d+)m\s+(?:\([^)]+\)\s+)?([\d:.]+)')
@@ -80,7 +89,7 @@ def extrair_dados_pdf_escalavel(caminho_pdf: str) -> List[Dict]:
                 if match_atleta:
                     rank, heat_opcional, lane, nome, nat, rt_opcional, tempo_final = match_atleta.groups()
                     nadador_atual = {
-                        "campeonato": os.path.basename(caminho_pdf).replace('.pdf', ''),
+                        "campeonato": obter_nome_campeonato(caminho_pdf),
                         "tipo_piscina": "Short Course" if "curta" in caminho_pdf.lower() else "Long Course",
                         "genero": contexto["genero"],
                         "distancia_prova": contexto["distancia_prova"],
@@ -244,7 +253,7 @@ def main():
     
     novos_pdfs = []
     for caminho in arquivos_pdf:
-        nome_camp = os.path.basename(caminho).replace('.pdf', '')
+        nome_camp = obter_nome_campeonato(caminho)
         if nome_camp not in campeonatos_processados:
             novos_pdfs.append(caminho)
             

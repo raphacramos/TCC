@@ -1,3 +1,0 @@
-- definir uma porcentagem de tempo atual para o tempo antigo para basear a partir de que ano eu vou extrair os dados.
-- ter exatamente em mente quais perguntas eu quero responder. para poder ver com o que eu vou trabalhar.
-- concluir a extraçao e dados e já ter uma análise deles, para trazer um insight interessante.
