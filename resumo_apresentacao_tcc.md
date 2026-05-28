@@ -8,7 +8,7 @@
 ## Slide 1: Introdução ao Problema
 * **Indagação Central:** Como os atletas de elite mundial de natação gerenciam a sua velocidade ao longo de provas de longa distância (400m, 800m e 1500m Livre) para maximizar o rendimento?
 * **O Desafio dos Dados:** Tradicionalmente, as parciais são analisadas apenas em tempo absoluto. Para comparar atletas de níveis diferentes de forma puramente estratégica, normalizamos todas as parciais usando a **Velocidade Relativa (%)** em relação à média global de cada nadador na prova.
-* **O Dataset:** Dados 100% reais de **3.923 performances** e mais de 100.000 parciais extraídos via Python dos relatórios oficiais da Omega Timing (Olimpíadas, Mundiais e Europeus de 2012 a 2025).
+* **O Dataset:** Dados 100% reais de **5.665 performances** e mais de 100.000 parciais extraídos via Python dos relatórios oficiais da Omega Timing (Olimpíadas, Mundiais e Europeus de 2012 a 2025).
 
 ---
 
@@ -29,27 +29,29 @@
 
 ## Slide 3: Pacing vs. Medalhas (Qui-Quadrado)
 * **Indagação Científica:** A estratégia de distribuição de energia adotada pelo nadador determina se ele subirá ao pódio ou se ele está fadado a perder nas Finais de elite?
-* **Análise Estatística:** Teste de Independência do Qui-Quadrado ($\chi^2$) aplicado a 2.042 finalistas de 400m Livre (Longa).
+* **Análise Estatística:** Teste de Independência do Qui-Quadrado ($\chi^2$) aplicado a 1.234 finalistas de 400m Livre (Longa).
   * **Hipótese Nula ($H_0$):** Conquistar uma medalha é independente do perfil de pacing adotado.
 * **Os Resultados dos Dados:**
-  * **Parabólico (Sprint Final):** 90 medalhistas de 736 performances (**12,2% de sucesso**)
-  * **Uniforme / Estável:** 42 medalhistas de 624 performances (**6,7% de sucesso**)
-  * **Positivo Tradicional:** 17 medalhistas de 583 performances (**2,9% de sucesso**)
-  * **Super Agressivo (Fly & Die):** 0 medalhistas de 99 performances (**0% de sucesso**)
-* **Decisão Estatística:** $\chi^2 = 51,0898$ | **p-valor = 0.0000** ($p < 0.05$)
+  * **Parabólico (Sprint Final):** 47 medalhistas de 413 performances (**11,38% de sucesso**)
+  * **Uniforme / Estável:** 22 medalhistas de 346 performances (**6,36% de sucesso**)
+  * **Positivo Tradicional:** 9 medalhistas de 396 performances (**2,27% de sucesso**)
+  * **Super Agressivo (Fly & Die):** 0 medalhistas de 79 performances (**0% de sucesso**)
+* **Decisão Estatística:** $\chi^2 = 34,1433$ | **p-valor = 0.0000** ($p < 0.05$)
 * **Conclusão:** Rejeita-se $H_0$. O pacing determina diretamente a probabilidade de pódio. O nado Parabólico e o Uniforme são os mais bem-sucedidos. A estratégia Super Agressiva na final resulta em colapso muscular precoce e aproveitamento nulo de pódios.
 
 ---
 
 ## Slide 4: O Risco das Táticas (ANOVA de Tempos Finais)
 * **Imagem de Referência:** `anova_tempo_por_estrategia.png`
-* **Indagação Científica:** Se a tática "Super Agressiva (Fly & Die)" tem 0% de aproveitamento em medalhas nas finais, por que ela apresenta os tempos médios finais mais baixos e rápidos nas estatísticas gerais?
+* **Indagação Científica:** Como as diferentes estratégias de pacing impactam o tempo final de prova? O perfil "Super Agressivo (Fly & Die)" justifica seu risco fisiológico com tempos finais mais rápidos?
 * **O que o gráfico boxplot mostra:**
   * Distribuição dos tempos finais de prova em segundos para as 4 estratégias.
-  * Média de tempo do cluster *Super Agressivo*: 337,93s ($N=99$)
-  * Média de tempo do cluster *Parabólico*: 427,53s ($N=736$)
-* **Decisão Estatística:** $F = 11,4741$ | **p-valor = 0.0000** (Diferença de médias altamente significante)
-* **Resposta Biomecânica:** A tática *Super Agressiva* é de altíssimo risco e alto custo energético. Ela só é sustentada e adotada por nadadores com capacidades físicas excepcionais em eliminatórias muito rápidas. No entanto, sob a pressão de uma final competitiva, os atletas que controlam a energia (*Parabólico* e *Uniforme*) levam a melhor sobre aqueles que tentam "vencer a prova no início".
+  * Média de tempo do cluster *Parabólico*: 236,95s ($N=413$)
+  * Média de tempo do cluster *Uniforme*: 241,40s ($N=346$)
+  * Média de tempo do cluster *Positivo*: 244,14s ($N=396$)
+  * Média de tempo do cluster *Super Agressivo*: 258,68s ($N=79$)
+* **Decisão Estatística:** $F = 56,5778$ | **p-valor = 0.0000** (Diferença de médias altamente significante)
+* **Resposta Biomecânica:** A tática *Super Agressiva (Fly & Die)* resulta no tempo médio final mais lento e taxa de medalhas nula. Isso prova que o esgotamento anaeróbico precoce em provas de fundo é prejudicial. Por outro lado, a tática *Parabólica* é a mais eficiente por conservar energia no terço médio e usar aceleração anaeróbica alática na última parcial, resultando no menor tempo médio final.
 
 ---
 

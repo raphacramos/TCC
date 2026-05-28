@@ -840,7 +840,7 @@
                         </div>
                         <div class="meta-item" style="border-left: 1px solid var(--border-color); padding-left: 3rem;">
                             <span class="meta-label">Base de Dados</span>
-                            <span class="meta-value">3.923 Nadadores</span>
+                            <span class="meta-value">5.665 Performances</span>
                         </div>
                     </div>
                 </div>
@@ -901,8 +901,8 @@
                                 <br>&bull; $H_0$: A escolha da estratégia de pacing e a conquista de medalha são independentes.
                                 <br>&bull; $H_1$: Há dependência direta entre a estratégia adotada e a chance de pódio.
                             </li>
-                            <li><strong>Resultado Estatístico Robusto:</strong> Com uma estatística $\chi^2 = 51,0898$ e um <span class="highlight-gold">p-valor de 0.0000</span> ($p < 0.05$), rejeitamos vigorosamente a hipótese nula $H_0$.</li>
-                            <li><strong>A Taxa de Sucesso dos Clusters:</strong> Pacing *Parabólico* (sprint final forte) é a tática mais vitoriosa (**12.2% de medalhas**), seguida do *Uniforme* (6.7%). O pacing *Super Agressivo* tem **0.0% de medalhas nas finais**, provando ser letal fisiologicamente.</li>
+                            <li><strong>Resultado Estatístico Robusto:</strong> Com uma estatística $\chi^2 = 34.1433$ e um <span class="highlight-gold">p-valor de 0.0000</span> ($p < 0.05$), rejeitamos vigorosamente a hipótese nula $H_0$.</li>
+                            <li><strong>A Taxa de Sucesso dos Clusters:</strong> Pacing *Parabólico* (sprint final forte) é a tática mais vitoriosa (**11.38% de medalhas**), seguida do *Uniforme* (6.36%). O pacing *Super Agressivo* tem **0.0% de medalhas nas finais**, provando ser letal fisiologicamente.</li>
                         </ul>
                     </div>
                     
@@ -922,25 +922,25 @@
                                     <tbody>
                                         <tr>
                                             <td class="highlight-gold">Parabólico (Sprint Final)</td>
-                                            <td>646</td>
-                                            <td>90</td>
-                                            <td class="highlight-gold">12,23%</td>
+                                            <td>366</td>
+                                            <td>47</td>
+                                            <td class="highlight-gold">11,38%</td>
                                         </tr>
                                         <tr>
                                             <td class="highlight-cyan">Uniforme / Estável</td>
-                                            <td>582</td>
-                                            <td>42</td>
-                                            <td class="highlight-cyan">6,73%</td>
+                                            <td>324</td>
+                                            <td>22</td>
+                                            <td class="highlight-cyan">6,36%</td>
                                         </tr>
                                         <tr>
                                             <td>Positivo (Variante 2)</td>
-                                            <td>566</td>
-                                            <td>17</td>
-                                            <td>2,92%</td>
+                                            <td>387</td>
+                                            <td>9</td>
+                                            <td>2,27%</td>
                                         </tr>
                                         <tr style="color: hsl(0, 70%, 65%);">
                                             <td>Super Agressivo (Fly & Die)</td>
-                                            <td>99</td>
+                                            <td>79</td>
                                             <td>0</td>
                                             <td>0,00%</td>
                                         </tr>
@@ -951,7 +951,7 @@
                         <div class="formula-card" style="width:100%;margin-top:1rem;">
                             <div class="formula-title">Resultado dos Testes</div>
                             <div style="font-size:0.9rem;line-height:1.5;">
-                                <strong>Chi-Square Stat:</strong> 51.0898<br>
+                                <strong>Chi-Square Stat:</strong> 34.1433<br>
                                 <strong>P-Value:</strong> 0.00000 (Significância de 99.99%)<br>
                                 <span class="highlight-gold">Decisão: Rejeitar H0</span>
                             </div>
@@ -971,14 +971,14 @@
                         
                         <div class="inquiry-card">
                             <span class="inquiry-label">Indagação Científica</span>
-                            <p class="inquiry-text">Se o perfil "Super Agressivo (Fly & Die)" tem aproveitamento zero de pódios nas finais, por que sua média geral de tempo é a mais rápida (337.93s) nos dados globais?</p>
+                            <p class="inquiry-text">Como as diferentes estratégias de pacing afetam o tempo final de prova? O perfil "Super Agressivo (Fly & Die)" justifica seu risco fisiológico com tempos mais rápidos?</p>
                         </div>
 
                         <ul class="bullet-list">
                             <li><strong>ANOVA das Velocidades e Tempos:</strong> Testamos se os tempos finais absolutos (em segundos) pertencem à mesma média populacional em todas as quatro estratégias.</li>
-                            <li><strong>Significância Estatística:</strong> O teste ANOVA resultou em um valor $F = 11,4741$ com um <span class="highlight-cyan">p-valor de 0.0000</span> ($p < 0.05$). Rejeita-se a hipótese nula de igualdade de médias.</li>
-                            <li><strong>O paradoxo do "Fly & Die":</strong> Nadadores no cluster *Super Agressivo* têm média de tempo final de **337.93s** ($N=99$), muito mais rápido que o *Uniforme* com **435.81s** ($N=624$).</li>
-                            <li><strong>Justificativa Esportiva:</strong> O estilo *Super Agressivo* é de altíssimo risco e demanda energética. Ele só é tentado por nadadores muito velozes nas **eliminatórias** para garantir índices de classificação rápida. Mas, no pódio da **final**, a tática explode e os nadadores sofrem desaceleração crítica.</li>
+                            <li><strong>Significância Estatística:</strong> O teste ANOVA resultou em um valor $F = 56.5778$ com um <span class="highlight-cyan">p-valor de 0.0000</span> ($p < 0.05$). Rejeita-se a hipótese nula de igualdade de médias.</li>
+                            <li><strong>Validação dos Tempos Finais:</strong> Os dados limpos revelam que a estratégia *Parabólica* é a mais rápida com tempo médio de **236.95s** ($N=413$), seguida pela *Uniforme* com **241.40s** ($N=346$), *Positiva* com **244.14s** ($N=396$) e, finalmente, a mais lenta sendo a *Super Agressiva* com **258.68s** ($N=79$).</li>
+                            <li><strong>Justificativa Esportiva:</strong> A estratégia *Super Agressiva (Fly & Die)* apresenta o pior tempo médio e taxa de sucesso nula em pódios. Isso comprova biomecanicamente a ineficiência do esgotamento anaeróbico precoce em provas de fundo, enquanto a estratégia *Parabólica* demonstra ser a ideal por balancear a economia de energia no terço médio e aceleração anaeróbica alática residual nos metros finais.</li>
                         </ul>
                     </div>
                     

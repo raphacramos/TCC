@@ -19,7 +19,7 @@ def rodar_inferencia_estatistica():
     df_consolidado = df_completo.drop_duplicates(subset=['campeonato', 'tipo_piscina', 'genero', 'distancia_prova', 'fase', 'atleta'], keep='last').copy()
     
     # Criar id_performance para o merge
-    df_consolidado['id_performance'] = df_consolidado['campeonato'] + " | " + df_consolidado['atleta'] + " (" + df_consolidado['genero'] + " " + df_consolidado['fase'] + ")"
+    df_consolidado['id_performance'] = df_consolidado['campeonato'] + " | " + df_consolidado['atleta'] + " (" + df_consolidado['genero'] + " " + df_consolidado['fase'] + " " + df_consolidado['distancia_prova'].astype(str) + "m " + df_consolidado['tipo_piscina'] + ")"
     
     # O tempo final é o tempo acumulado da última parcial
     df_consolidado['tempo_final_seg'] = df_consolidado['tempo_acumulado_seg']

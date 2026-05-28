@@ -78,7 +78,7 @@ def rodar_pipeline_kmeans():
                 ax.set_visible(False)
                 continue
                 
-            df_dist['id_performance'] = df_dist['campeonato'] + " | " + df_dist['atleta'] + " (" + df_dist['genero'] + " " + df_dist['fase'] + ")"
+            df_dist['id_performance'] = df_dist['campeonato'] + " | " + df_dist['atleta'] + " (" + df_dist['genero'] + " " + df_dist['fase'] + " " + df_dist['distancia_prova'].astype(str) + "m " + df_dist['tipo_piscina'] + ")"
             # Garantir que não haja duplicatas caso o mesmo PDF esteja duplicado na pasta
             df_dist = df_dist.drop_duplicates(subset=['id_performance', 'distancia_parcial'])
             df_pivot = df_dist.pivot(index='id_performance', columns='distancia_parcial', values='velocidade_relativa')

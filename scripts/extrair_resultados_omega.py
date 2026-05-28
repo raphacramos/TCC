@@ -61,7 +61,7 @@ def extrair_dados_pdf_escalavel(caminho_pdf: str) -> List[Dict]:
     dinamicamente as parciais empilhadas (400m, 800m, 1500m).
     """
     # Regex 1: Identifica a linha inicial do atleta (suporta Formato Heats com Data de Nascimento/Ano e Heat Number)
-    padrao_atleta = re.compile(r'^(\d+)\s+(?:(\d+)\s+)?(\d+)\s+([A-Za-z\s\-\'\.]+?)\s+(?:\d{4}\s+)?([A-Z]{3})\s+(?:\d{1,2}\s+[A-Z]{3}\s+\d{4}\s+)?([\d.]+)?\s*([\d:.]+|DSQ|DNS)')
+    padrao_atleta = re.compile(r'^(\d+)\s+(?:(\d+)\s+)?(\d+)\s+((?:[^\W\d_]|\s|\-|\'|\.)+?)\s+(?:\d{4}\s+)?([A-Z]{3})\s+(?:\d{1,2}\s+[A-Z]{3}\s+\d{4}\s+)?([\d.]+)?\s*([\d:.]+|DSQ|DNS)')
     
     # Regex 2: Captura qualquer padrão de split na linha (Com ou sem posição entre parênteses)
     padrao_parciais = re.compile(r'(\d+)m\s+(?:\([^)]+\)\s+)?([\d:.]+)')

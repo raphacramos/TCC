@@ -18,7 +18,7 @@ def gerar_graficos_fase_2():
         
     # Preparar Dados Consolidados (Última linha por performance)
     df_consolidado = df_completo.drop_duplicates(subset=['campeonato', 'tipo_piscina', 'genero', 'distancia_prova', 'fase', 'atleta'], keep='last').copy()
-    df_consolidado['id_performance'] = df_consolidado['campeonato'] + " | " + df_consolidado['atleta'] + " (" + df_consolidado['genero'] + " " + df_consolidado['fase'] + ")"
+    df_consolidado['id_performance'] = df_consolidado['campeonato'] + " | " + df_consolidado['atleta'] + " (" + df_consolidado['genero'] + " " + df_consolidado['fase'] + " " + df_consolidado['distancia_prova'].astype(str) + "m " + df_consolidado['tipo_piscina'] + ")"
     
     # Merge
     df_analise = df_kmeans.merge(df_consolidado, on='id_performance', how='inner')
@@ -44,7 +44,7 @@ def gerar_graficos_fase_2():
     # ---------------------------------------------------------
     print("Gerando Análise 2: Assinatura de Gênero (Constância de Pacing)...")
     # Agrupamos as parciais inteiras para calcular o desvio padrao de cada nadador
-    df_completo['id_performance'] = df_completo['campeonato'] + " | " + df_completo['atleta'] + " (" + df_completo['genero'] + " " + df_completo['fase'] + ")"
+    df_completo['id_performance'] = df_completo['campeonato'] + " | " + df_completo['atleta'] + " (" + df_completo['genero'] + " " + df_completo['fase'] + " " + df_completo['distancia_prova'].astype(str) + "m " + df_completo['tipo_piscina'] + ")"
     std_pacing = df_completo.groupby(['id_performance', 'genero'])['velocidade_relativa'].std().reset_index()
     std_pacing.rename(columns={'velocidade_relativa': 'std_velocidade'}, inplace=True)
     

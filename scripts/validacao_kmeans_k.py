@@ -16,7 +16,7 @@ def rodar_validacao_matematica_k():
     df_400 = df[(df['distancia_prova'] == 400) & (df['tipo_piscina'] == 'Long Course')].copy()
     
     # Montar Tensor de Pacing
-    df_400['id_performance'] = df_400['campeonato'] + " | " + df_400['atleta'] + " (" + df_400['genero'] + " " + df_400['fase'] + ")"
+    df_400['id_performance'] = df_400['campeonato'] + " | " + df_400['atleta'] + " (" + df_400['genero'] + " " + df_400['fase'] + " " + df_400['distancia_prova'].astype(str) + "m " + df_400['tipo_piscina'] + ")"
     df_400 = df_400.drop_duplicates(subset=['id_performance', 'distancia_parcial'])
     df_pivot = df_400.pivot(index='id_performance', columns='distancia_parcial', values='velocidade_relativa').dropna()
     
