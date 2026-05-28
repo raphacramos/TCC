@@ -27,62 +27,70 @@ def rodar_inferencia_estatistica():
     # Merge com os resultados do kmeans
     df_analise = df_resultados.merge(df_consolidado[['id_performance', 'medalhista', 'tempo_final_seg']], on='id_performance', how='inner')
     
-    # Vamos focar na prova de 400m Livre (Long Course) para a prova estatística
-    df_prova = df_analise[df_analise['Prova'] == '400m Livre (Long Course)'].copy()
-    if df_prova.empty:
-        print("Sem dados de 400m Long Course para realizar o teste. Abortando.")
-        return
-        
-    print(f"Analisando {len(df_prova)} performances na prova de 400m Livre (Long Course).")
+    distancias = [400, 800, 1500]
+    tipos_piscina = ['Long Course', 'Short Course']
     
-    # -------------------------------------------------------------
-    # Teste 1: Qui-Quadrado (Chi-Square) - Variáveis Categóricas
-    # Pergunta: A escolha da estratégia (Cluster) afeta a probabilidade de ganhar medalha?
-    # -------------------------------------------------------------
-    print("\n--- TESTE 1: Qui-Quadrado (Associação entre Estratégia e Medalha) ---")
-    tabela_contingencia = pd.crosstab(df_prova['Estrategia_Pacing'], df_prova['medalhista'])
-    print("Tabela de Contingência (Frequência Observada):")
-    print(tabela_contingencia)
+    fig, axes = plt.subplots(3, 2, figsize=(16, 18))
     
-    chi2, p_valor_chi2, dof, esperada = chi2_contingency(tabela_contingencia)
-    print(f"\nEstatística Chi-Square: {chi2:.4f}")
-    print(f"P-Valor: {p_valor_chi2:.4f}")
-    if p_valor_chi2 < 0.05:
-        print("=> CONCLUSÃO: Rejeitamos a Hipótese Nula (H0). Existe relação estatisticamente significante entre o Pacing e a chance de medalha!")
-    else:
-        print("=> CONCLUSÃO: Falha ao rejeitar H0. Não há evidência estatística de que o Pacing afeta diretamente a chance de medalha neste recorte.")
+    print("\n======================================================================")
+    print("INFERÊNCIA ESTATÍSTICA GLOBAL - CHI-SQUARE & ANOVA")
+    print("======================================================================")
+    
+    for i, dist in enumerate(distancias):
+        for j, tipo in enumerate(tipos_piscina):
+            nome_prova = f"{dist}m Livre ({tipo})"
+            ax = axes[i, j]
+            
+            df_prova = df_analise[df_analise['Prova'] == nome_prova].copy()
+            if df_prova.empty:
+                print(f"\nSem dados para {nome_prova}. Pulando.")
+                ax.set_visible(False)
+                continue
+                
+            print(f"\n>>> Analisando {len(df_prova)} performances na prova de {nome_prova}...")
+            
+            # Teste 1: Qui-Quadrado
+            tabela_contingencia = pd.crosstab(df_prova['Estrategia_Pacing'], df_prova['medalhista'])
+            try:
+                chi2, p_valor_chi2, dof, esperada = chi2_contingency(tabela_contingencia)
+                print(f"  [Qui-Quadrado] Chi-Square Stat: {chi2:.4f} | p-valor: {p_valor_chi2:.4e} | dof: {dof}")
+                if p_valor_chi2 < 0.05:
+                    print("  => Conclusão: Relação estatisticamente significante entre pacing e medalha!")
+                else:
+                    print("  => Conclusão: Relação não significante.")
+            except Exception as e:
+                print(f"  [Qui-Quadrado] Erro ao rodar teste: {e}")
+                
+            # Teste 2: ANOVA
+            grupos = []
+            nomes_grupos = df_prova['Estrategia_Pacing'].unique()
+            for estrategia in nomes_grupos:
+                tempos = df_prova[df_prova['Estrategia_Pacing'] == estrategia]['tempo_final_seg'].dropna()
+                if len(tempos) > 0:
+                    grupos.append(tempos)
+                    print(f"    - Média {estrategia}: {tempos.mean():.2f}s (n={len(tempos)})")
+            
+            if len(grupos) > 1:
+                f_stat, p_valor_anova = f_oneway(*grupos)
+                print(f"  [ANOVA] F-Statistic: {f_stat:.4f} | p-valor: {p_valor_anova:.4e}")
+                if p_valor_anova < 0.05:
+                    print("  => Conclusão: Diferença de médias altamente significante!")
+                else:
+                    print("  => Conclusão: Sem diferença significante entre as médias.")
+            else:
+                print("  [ANOVA] Grupos insuficientes para rodar o teste.")
+                
+            # Plotar Boxplot no grid 3x2
+            sns.boxplot(data=df_prova, x='Estrategia_Pacing', y='tempo_final_seg', ax=ax, palette='Set2', hue='Estrategia_Pacing', legend=False)
+            ax.set_title(f'ANOVA: {nome_prova}', fontsize=12, fontweight='bold')
+            ax.set_xlabel('Estratégia de Pacing', fontsize=9)
+            ax.set_ylabel('Tempo Final (segundos)', fontsize=9)
+            ax.tick_params(axis='x', rotation=15, labelsize=8)
+            ax.grid(True, linestyle=':', alpha=0.5)
 
-    # -------------------------------------------------------------
-    # Teste 2: ANOVA (One-Way Analysis of Variance) - Variável Contínua
-    # Pergunta: O tempo final médio difere significativamente entre os diferentes Clusters?
-    # -------------------------------------------------------------
-    print("\n--- TESTE 2: ANOVA (Tempo Final vs Estratégia) ---")
-    
-    grupos = []
-    nomes_grupos = df_prova['Estrategia_Pacing'].unique()
-    for estrategia in nomes_grupos:
-        tempos = df_prova[df_prova['Estrategia_Pacing'] == estrategia]['tempo_final_seg'].dropna()
-        grupos.append(tempos)
-        print(f"Média de Tempo - {estrategia}: {tempos.mean():.2f}s (n={len(tempos)})")
-        
-    f_stat, p_valor_anova = f_oneway(*grupos)
-    print(f"\nEstatística F (ANOVA): {f_stat:.4f}")
-    print(f"P-Valor: {p_valor_anova:.4f}")
-    if p_valor_anova < 0.05:
-        print("=> CONCLUSÃO: Rejeitamos a Hipótese Nula (H0). Pelo menos uma das estratégias de Pacing resulta em um tempo final estatisticamente diferente!")
-    else:
-        print("=> CONCLUSÃO: Falha ao rejeitar H0. Os tempos finais médios não são estatisticamente diferentes entre as estratégias.")
-
-    # Gerar Boxplot para visualização da ANOVA
-    plt.figure(figsize=(10, 6))
-    sns.boxplot(data=df_prova, x='Estrategia_Pacing', y='tempo_final_seg', palette='Set2')
-    plt.title('ANOVA: Distribuição do Tempo Final por Estratégia de Pacing (400m Livre)', fontsize=14)
-    plt.xlabel('Estratégia de Pacing', fontsize=12)
-    plt.ylabel('Tempo Final (segundos)', fontsize=12)
-    plt.xticks(rotation=15)
     plt.tight_layout()
     plt.savefig('anova_tempo_por_estrategia.png', dpi=300)
-    print("\n>>> Gráfico Boxplot da ANOVA salvo em 'anova_tempo_por_estrategia.png'")
+    print("\n>>> Gráfico global de Boxplots ANOVA salvo em 'anova_tempo_por_estrategia.png'")
 
 if __name__ == "__main__":
     rodar_inferencia_estatistica()
