@@ -16,9 +16,11 @@
 * **Imagem de Referência:** `validacao_kmeans_k.png`
 * **Indagação Científica:** Como provar matematicamente que o comportamento estratégico dos atletas de elite se agrupa em exatamente 4 perfis distintos, sem depender de palpites ou viés humano?
 * **O que o gráfico mostra:**
-  * **Método do Cotovelo (Elbow Curve):** Queda acentuada da inércia que se estabiliza a partir de $K=4$ clusters.
-  * **Coeficiente de Silhueta (Silhouette Score):** Pico local indicando que a coesão interna e separação dos grupos é maximizada com $K=4$ em um tensor demonstrativo de 1.234 atletas por 8 parciais.
-* **Conclusão:** Os nadadores de elite não nadam de forma aleatória; eles adotam 4 assinaturas táticas claras: *Uniforme/Estável*, *Parabólico (Sprint Final)*, *Super Agressivo (Fly & Die)* e *Positivo Tradicional*.
+  * **Método do Cotovelo (Elbow Curve):** Queda acentuada da inércia (soma dos quadrados internos) que se estabiliza a partir de $K=4$ clusters.
+  * **Coeficiente de Silhueta (Silhouette Score):** O Silhouette score mostra $K=2$ com o maior pico (0.327), mas esta divisão é simples demais (ex: rápidos vs. lentos). O segundo pico local ocorre em $K=5$ (0.203), com $K=4$ logo atrás (0.198) — uma diferença marginal de apenas 0,005.
+* **O Dilema de Seleção ($K=4$ vs. $K=5$):**
+  * **Por que K=4 foi preferido?** A escolha de $K=4$ equilibra a otimização matemática com a **interpretabilidade biomecânica**. Na literatura de ciências do esporte (Abbiss & Laursen, 2008), o pacing é tradicionalmente classificado em 4 perfis clássicos (Parabólico, Uniforme, Positivo e Negativo/Fly & Die). Adicionar um 5º cluster traria complexidade desnecessária (subdividindo o grupo *Positivo* em variantes redundantes) sem acrescentar novos comportamentos táticos explicáveis.
+* **Conclusão:** Os nadadores de elite não nadam de forma aleatória; eles adotam 4 assinaturas táticas claras chanceladas pela literatura esportiva e corroboradas pelo "cotovelo" da inércia.
 
 ---
 

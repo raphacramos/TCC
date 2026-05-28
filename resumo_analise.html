@@ -862,9 +862,9 @@
 
                         <ul class="bullet-list">
                             <li><strong>Modelagem sem Mistura de Provas:</strong> Para evitar a distorção nas distâncias (por exemplo, 400m Livre tem 8 splits, enquanto 1500m Livre em piscina curta tem 60 splits), modelamos algoritmos de **K-Means independentes** para cada prova/piscina.</li>
-                            <li><strong>Curva do Cotovelo (Elbow Curve):</strong> O gráfico esquerdo mostra a inércia (Soma dos Quadrados das Distâncias) decaindo com clareza. Há uma quebra de inclinação ("cotovelo") muito bem marcada na coordenada de <span class="highlight-cyan">K=4</span>.</li>
-                            <li><strong>Análise de Silhueta (Silhouette Score):</strong> O gráfico direito exibe o valor da silhueta de $K=2$ até $K=10$. A escolha de <span class="highlight-cyan">K=4</span> se estabelece como a melhor em termos de coesão interna do cluster e distância entre fronteiras.</li>
-                            <li><strong>Rotulagem Biomecânica:</strong> A validação matemática chancela a categorização das quatro grandes teorias de pacing descritas na literatura esportiva.</li>
+                            <li><strong>Curva do Cotovelo (Elbow Curve):</strong> O gráfico esquerdo mostra a inércia decaindo com clareza. Há uma quebra de inclinação ("cotovelo") muito bem marcada na coordenada de <span class="highlight-cyan">K=4</span>.</li>
+                            <li><strong>Análise de Silhueta (Silhouette Score):</strong> O gráfico direito mostra o maior pico em $K=2$ (0.327), que geraria grupos muito triviais (ex: rápidos vs. lentos). O segundo pico local ocorre em $K=5$ (0.203), seguido muito de perto por <span class="highlight-cyan">K=4</span> (0.198) — uma diferença marginal de apenas 0,005.</li>
+                            <li><strong>Escolha de K=4 (Interpretabilidade Biomecânica):</strong> A escolha de $K=4$ equilibra a precisão matemática com a literatura científica (Abbiss & Laursen, 2008), que descreve 4 perfis tradicionais de pacing (Parabólico, Uniforme, Positivo e Fly & Die). Um cluster de $K=5$ apenas subdividiria o perfil *Positivo* de forma redundante e sem valor tático.</li>
                         </ul>
                     </div>
                     
