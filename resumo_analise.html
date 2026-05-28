@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCC: Análise de Pacing na Natação de Elite</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS RESET & VARIABLES */
+        :root {
+            --bg-primary: hsl(222, 47%, 7%);
+            --bg-secondary: hsl(223, 47%, 12%);
+            --bg-card: hsla(223, 47%, 16%, 0.8);
+            --bg-card-hover: hsla(223, 47%, 20%, 0.9);
+            --border-color: hsla(223, 47%, 24%, 0.4);
+            
+            --text-title: hsl(0, 0%, 100%);
+            --text-body: hsl(210, 40%, 93%);
+            --text-muted: hsl(215, 20%, 65%);
+            
+            /* Accents */
+            --accent-cyan: hsl(188, 86%, 53%);
+            --accent-cyan-glow: hsla(188, 86%, 53%, 0.25);
+            --accent-indigo: hsl(250, 89%, 65%);
+            --accent-indigo-glow: hsla(250, 89%, 65%, 0.25);
+            --accent-gold: hsl(38, 92%, 50%);
+            --accent-gold-glow: hsla(38, 92%, 50%, 0.25);
+            
+            /* Transitions */
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --sidebar-width: 280px;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: hsl(210, 20%, 96%);
+            --bg-secondary: hsl(0, 0%, 100%);
+            --bg-card: hsla(210, 20%, 90%, 0.7);
+            --bg-card-hover: hsla(210, 20%, 85%, 0.85);
+            --border-color: hsla(210, 20%, 80%, 0.5);
+            
+            --text-title: hsl(222, 47%, 11%);
+            --text-body: hsl(222, 47%, 20%);
+            --text-muted: hsl(215, 15%, 45%);
+            
+            --accent-cyan-glow: hsla(188, 86%, 53%, 0.15);
+            --accent-indigo-glow: hsla(250, 89%, 65%, 0.15);
+            --accent-gold-glow: hsla(38, 92%, 50%, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-body);
+            overflow-x: hidden;
+            display: flex;
+            min-height: 100vh;
+            transition: var(--transition-smooth);
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-title);
+            font-weight: 700;
+        }
+
+        /* CUSTOM SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cyan);
+        }
+
+        /* SIDEBAR NAVIGATION */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1.5rem;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            transition: var(--transition-smooth);
+        }
+
+        .sidebar-header {
+            margin-bottom: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sidebar-header svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--accent-cyan);
+            filter: drop-shadow(0 0 8px var(--accent-cyan-glow));
+        }
+
+        .sidebar-title {
+            font-size: 1.25rem;
+            line-height: 1.2;
+            background: linear-gradient(135deg, var(--text-title), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 0.25rem;
+        }
+
+        .nav-item {
+            width: 100%;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid transparent;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+            text-align: left;
+            background: transparent;
+        }
+
+        .nav-link:hover {
+            color: var(--text-body);
+            background: var(--bg-card);
+            border-color: var(--border-color);
+        }
+
+        .nav-link.active {
+            color: var(--text-title);
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-card-hover));
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px var(--accent-cyan-glow);
+        }
+
+        .nav-link svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            fill: currentColor;
+        }
+
+        .sidebar-footer {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        /* BUTTONS */
+        .btn-theme, .btn-fullscreen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-body);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-theme:hover, .btn-fullscreen:hover {
+            border-color: var(--accent-cyan);
+            color: var(--text-title);
+            box-shadow: 0 0 10px var(--accent-cyan-glow);
+        }
+
+        .btn-theme svg, .btn-fullscreen svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex-grow: 1;
+            padding: 2.5rem 3rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition-smooth);
+        }
+
+        .top-navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-subtitle {
+            font-size: 0.85rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            margin-top: 0.25rem;
+        }
+
+        /* PRESENTATION VIEWER */
+        .presentation-container {
+            position: relative;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+            flex-grow: 1;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* COVER SLIDE */
+        .cover-slide {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 4rem 2rem;
+            background: radial-gradient(circle at center, var(--accent-indigo-glow) 0%, transparent 70%);
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            flex-grow: 1;
+            min-height: 60vh;
+        }
+
+        .cover-badge {
+            background-color: var(--accent-cyan-glow);
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 15px var(--accent-cyan-glow);
+        }
+
+        .cover-title {
+            font-size: 3.5rem;
+            line-height: 1.15;
+            max-width: 900px;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--text-title) 50%, var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cover-desc {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin-bottom: 3.5rem;
+            line-height: 1.6;
+        }
+
+        .cover-meta {
+            display: flex;
+            gap: 3rem;
+            text-align: left;
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+            width: 100%;
+            max-width: 600px;
+            justify-content: center;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .meta-value {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-title);
+            margin-top: 0.25rem;
+        }
+
+        /* GRID CONTENT SLIDES */
+        .slide-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 2.5rem;
+            align-items: start;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 1024px) {
+            .slide-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* INQUIRY CARD */
+        .inquiry-card {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-card-hover));
+            border: 1px solid var(--accent-cyan);
+            box-shadow: 0 4px 20px var(--accent-cyan-glow);
+            border-radius: 16px;
+            padding: 1.5rem 1.75rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .inquiry-card::before {
+            content: '?';
+            position: absolute;
+            right: -10px;
+            bottom: -20px;
+            font-size: 8rem;
+            font-weight: 800;
+            font-family: 'Outfit';
+            color: var(--accent-cyan-glow);
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        .inquiry-label {
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .inquiry-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--text-title);
+        }
+
+        /* ANALYTICAL TEXT BOX */
+        .analysis-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.75rem;
+            height: 100%;
+        }
+
+        .section-subtitle {
+            font-size: 1rem;
+            color: var(--accent-indigo);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-subtitle svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .bullet-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1.1rem;
+        }
+
+        .bullet-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .bullet-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.55rem;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--accent-cyan);
+            box-shadow: 0 0 6px var(--accent-cyan);
+        }
+
+        .bullet-list strong {
+            color: var(--text-title);
+            font-weight: 600;
+        }
+
+        /* IMAGE GRAPH DISPLAY */
+        .graph-container {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: sticky;
+            top: 2rem;
+            gap: 0.75rem;
+            overflow: hidden;
+        }
+
+        .graph-image-wrapper {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: hsl(223, 47%, 8%);
+            border: 1px solid var(--border-color);
+            position: relative;
+            cursor: zoom-in;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .graph-image {
+            width: 100%;
+            height: auto;
+            max-height: 480px;
+            object-fit: contain;
+            transition: transform 0.5s ease;
+        }
+
+        .graph-image-wrapper:hover .graph-image {
+            transform: scale(1.02);
+        }
+
+        .graph-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .graph-label svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        /* TABLES (CHI-SQUARE & STATS) */
+        .stats-table-wrapper {
+            margin-top: 1.25rem;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+
+        .stats-table th {
+            background-color: hsla(223, 47%, 20%, 0.6);
+            color: var(--text-title);
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .stats-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            background-color: hsla(223, 47%, 14%, 0.4);
+        }
+
+        .stats-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .stats-table tr:hover td {
+            background-color: hsla(223, 47%, 20%, 0.3);
+        }
+
+        .highlight-gold {
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        .highlight-cyan {
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        /* FORMULAS IN SLIDES */
+        .formula-card {
+            background-color: hsla(250, 89%, 65%, 0.05);
+            border-left: 3px solid var(--accent-indigo);
+            border-radius: 4px 12px 12px 4px;
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .formula-title {
+            font-size: 0.85rem;
+            color: var(--accent-indigo);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 0.25rem;
+        }
+
+        .formula-text {
+            font-size: 1.1rem;
+            color: var(--text-title);
+            font-weight: 600;
+            margin: 0.5rem 0;
+            letter-spacing: 0.5px;
+        }
+
+        .formula-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* MATH ALIGNMENT */
+        .math-symbol {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-weight: bold;
+        }
+
+        /* CONTROLS & FOOTER */
+        .slide-footer-controls {
+            margin-top: auto;
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slide-counter {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            color: var(--text-body);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-nav:hover:not(:disabled) {
+            border-color: var(--accent-cyan);
+            color: var(--text-title);
+            box-shadow: 0 0 12px var(--accent-cyan-glow);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-nav svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        /* IMAGE LIGHTBOX MODAL */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(7, 10, 18, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            cursor: zoom-out;
+        }
+
+        .lightbox-img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            animation: zoomIn 0.3s ease-out;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* FULLSCREEN IMMERSIVE PRESENTATION MODE */
+        body.fullscreen-mode {
+            background-color: hsl(222, 47%, 4%);
+        }
+
+        body.fullscreen-mode .sidebar {
+            transform: translateX(-100%);
+        }
+
+        body.fullscreen-mode .main-content {
+            margin-left: 0;
+            padding: 2rem 4rem;
+        }
+
+        body.fullscreen-mode .top-navbar {
+            border-color: transparent;
+            margin-bottom: 1.5rem;
+        }
+
+        body.fullscreen-mode .graph-container {
+            top: 1rem;
+        }
+
+        body.fullscreen-mode .graph-image {
+            max-height: 550px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <!-- Icon SVG representing swimming pool lane / analytics -->
+            <svg viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+            </svg>
+            <h2 class="sidebar-title">🏊‍♂️ Pacing Natação</h2>
+        </div>
+
+        <nav class="nav-list">
+            <li>
+                <button class="nav-link active" onclick="goToSlide(0)">
+                    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    Apresentação / Capa
+                </button>
+            </li>
+            <li>
+                <button class="nav-link" onclick="goToSlide(1)">
+                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                    1. Validação de K
+                </button>
+            </li>
+            <li>
+                <button class="nav-link" onclick="goToSlide(2)">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+                    2. Pacing vs. Medalhas
+                </button>
+            </li>
+            <li>
+                <button class="nav-link" onclick="goToSlide(3)">
+                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+                    3. ANOVA do Pacing
+                </button>
+            </li>
+            <li>
+                <button class="nav-link" onclick="goToSlide(4)">
+                    <svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6.18-6.18 4 4L20 9.41 22.29 11.7 22 6z"/></svg>
+                    4. Eliminatórias vs. Finais
+                </button>
+            </li>
+            <li>
+                <button class="nav-link" onclick="goToSlide(5)">
+                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    5. Gênero e Constância
+                </button>
+            </li>
+            <li>
+                <button class="nav-link" onclick="goToSlide(6)">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                    6. Escolas Nacionais
+                </button>
+            </li>
+            <li>
+                <button class="nav-link" onclick="goToSlide(7)">
+                    <svg viewBox="0 0 24 24"><path d="M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21v-2z"/></svg>
+                    7. Curta vs. Longa
+                </button>
+            </li>
+            <li>
+                <button class="nav-link" onclick="goToSlide(8)">
+                    <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    8. O Segredo do Ouro
+                </button>
+            </li>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="btn-theme" onclick="toggleTheme()" id="themeBtn">
+                <svg viewBox="0 0 24 24" id="themeIcon"><path d="M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+                <span id="themeText">Modo Claro</span>
+            </button>
+            <button class="btn-fullscreen" onclick="toggleFullscreen()" id="fullscreenBtn">
+                <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                Apresentação
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        
+        <!-- TOP NAV BAR -->
+        <header class="top-navbar">
+            <div class="page-info">
+                <span class="page-subtitle" id="slideSubtitle">Trabalho de Conclusão de Curso</span>
+                <h1 class="page-title" id="slideTitle">Análise de Pacing na Natação</h1>
+            </div>
+            <div>
+                <!-- Extra top header content if needed -->
+            </div>
+        </header>
+
+        <!-- SLIDES CONTAINER -->
+        <section class="presentation-container">
+
+            <!-- SLIDE 0: COVER -->
+            <div class="slide active">
+                <div class="cover-slide">
+                    <span class="cover-badge">Monografia de TCC</span>
+                    <h1 class="cover-title">Inteligência de Dados no Esporte: Análise de Pacing na Natação de Elite</h1>
+                    <p class="cover-desc">Identificação de perfis estratégicos de distribuição de velocidade em provas olímpicas e mundiais de 400m, 800m e 1500m Livre através de Machine Learning.</p>
+                    
+                    <div class="cover-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Autor</span>
+                            <span class="meta-value">Raphael Ramos</span>
+                        </div>
+                        <div class="meta-item" style="border-left: 1px solid var(--border-color); padding-left: 3rem;">
+                            <span class="meta-label">Orientação</span>
+                            <span class="meta-value">Ciência da Computação</span>
+                        </div>
+                        <div class="meta-item" style="border-left: 1px solid var(--border-color); padding-left: 3rem;">
+                            <span class="meta-label">Base de Dados</span>
+                            <span class="meta-value">3.923 Nadadores</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 1: K-MEANS VALIDATION -->
+            <div class="slide">
+                <div class="slide-grid">
+                    <div class="analysis-card">
+                        <h3 class="section-subtitle">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h7v2zm0-4H7V7h10v2z"/></svg>
+                            Análise Dimensional do Hiperparâmetro K
+                        </h3>
+                        
+                        <div class="inquiry-card">
+                            <span class="inquiry-label">Indagação Científica</span>
+                            <p class="inquiry-text">Como provar matematicamente que o comportamento de pacing dos atletas se agrupa em exatamente 4 perfis distintos, mitigando qualquer viés ou escolha humana arbitrária?</p>
+                        </div>
+
+                        <ul class="bullet-list">
+                            <li><strong>Modelagem sem Mistura de Provas:</strong> Para evitar a distorção nas distâncias (por exemplo, 400m Livre tem 8 splits, enquanto 1500m Livre em piscina curta tem 60 splits), modelamos algoritmos de **K-Means independentes** para cada prova/piscina.</li>
+                            <li><strong>Curva do Cotovelo (Elbow Curve):</strong> O gráfico esquerdo mostra a inércia (Soma dos Quadrados das Distâncias) decaindo com clareza. Há uma quebra de inclinação ("cotovelo") muito bem marcada na coordenada de <span class="highlight-cyan">K=4</span>.</li>
+                            <li><strong>Análise de Silhueta (Silhouette Score):</strong> O gráfico direito exibe o valor da silhueta de $K=2$ até $K=10$. A escolha de <span class="highlight-cyan">K=4</span> se estabelece como a melhor em termos de coesão interna do cluster e distância entre fronteiras.</li>
+                            <li><strong>Rotulagem Biomecânica:</strong> A validação matemática chancela a categorização das quatro grandes teorias de pacing descritas na literatura esportiva.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="graph-container">
+                        <div class="graph-image-wrapper" onclick="openLightbox(this)">
+                            <img src="scripts/validacao_kmeans_k.png" alt="Curva de Cotovelo e Coeficiente de Silhueta" class="graph-image">
+                        </div>
+                        <div class="graph-label">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                            Gráfico: validacao_kmeans_k.png
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 2: QUI-QUADRADO (PACING VS MEDALHA) -->
+            <div class="slide">
+                <div class="slide-grid">
+                    <div class="analysis-card">
+                        <h3 class="section-subtitle">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                            Inferência Categórica (Pacing vs. Medalhas)
+                        </h3>
+                        
+                        <div class="inquiry-card">
+                            <span class="inquiry-label">Indagação Científica</span>
+                            <p class="inquiry-text">A escolha da estratégia de nado (perfil do cluster) afeta a probabilidade real de o nadador conquistar uma medalha ou ele já entra na piscina sem chances de pódio?</p>
+                        </div>
+
+                        <ul class="bullet-list">
+                            <li><strong>Teste de Independência:</strong> Aplicamos o teste do **Qui-Quadrado ($\chi^2$)** cruzando os clusters gerados com a conquista de medalhas (Top 3) em finais.</li>
+                            <li><strong>Formulação das Hipóteses:</strong>
+                                <br>&bull; $H_0$: A escolha da estratégia de pacing e a conquista de medalha são independentes.
+                                <br>&bull; $H_1$: Há dependência direta entre a estratégia adotada e a chance de pódio.
+                            </li>
+                            <li><strong>Resultado Estatístico Robusto:</strong> Com uma estatística $\chi^2 = 51,0898$ e um <span class="highlight-gold">p-valor de 0.0000</span> ($p < 0.05$), rejeitamos vigorosamente a hipótese nula $H_0$.</li>
+                            <li><strong>A Taxa de Sucesso dos Clusters:</strong> Pacing *Parabólico* (sprint final forte) é a tática mais vitoriosa (**12.2% de medalhas**), seguida do *Uniforme* (6.7%). O pacing *Super Agressivo* tem **0.0% de medalhas nas finais**, provando ser letal fisiologicamente.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="graph-container">
+                        <div style="width:100%;">
+                            <h4 style="margin-bottom:0.5rem;font-size:0.95rem;">Tabela de Contingência (Finais - 400m Livre L.C.)</h4>
+                            <div class="stats-table-wrapper">
+                                <table class="stats-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Estratégia (Cluster)</th>
+                                            <th>Não Medalhista</th>
+                                            <th>Medalhista</th>
+                                            <th>Tx. Medalha</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="highlight-gold">Parabólico (Sprint Final)</td>
+                                            <td>646</td>
+                                            <td>90</td>
+                                            <td class="highlight-gold">12,23%</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="highlight-cyan">Uniforme / Estável</td>
+                                            <td>582</td>
+                                            <td>42</td>
+                                            <td class="highlight-cyan">6,73%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Positivo (Variante 2)</td>
+                                            <td>566</td>
+                                            <td>17</td>
+                                            <td>2,92%</td>
+                                        </tr>
+                                        <tr style="color: hsl(0, 70%, 65%);">
+                                            <td>Super Agressivo (Fly & Die)</td>
+                                            <td>99</td>
+                                            <td>0</td>
+                                            <td>0,00%</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="formula-card" style="width:100%;margin-top:1rem;">
+                            <div class="formula-title">Resultado dos Testes</div>
+                            <div style="font-size:0.9rem;line-height:1.5;">
+                                <strong>Chi-Square Stat:</strong> 51.0898<br>
+                                <strong>P-Value:</strong> 0.00000 (Significância de 99.99%)<br>
+                                <span class="highlight-gold">Decisão: Rejeitar H0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 3: ANOVA (TEMPO FINAL VS CLUSTERS) -->
+            <div class="slide">
+                <div class="slide-grid">
+                    <div class="analysis-card">
+                        <h3 class="section-subtitle">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+                            Análise de Variância (ANOVA One-Way)
+                        </h3>
+                        
+                        <div class="inquiry-card">
+                            <span class="inquiry-label">Indagação Científica</span>
+                            <p class="inquiry-text">Se o perfil "Super Agressivo (Fly & Die)" tem aproveitamento zero de pódios nas finais, por que sua média geral de tempo é a mais rápida (337.93s) nos dados globais?</p>
+                        </div>
+
+                        <ul class="bullet-list">
+                            <li><strong>ANOVA das Velocidades e Tempos:</strong> Testamos se os tempos finais absolutos (em segundos) pertencem à mesma média populacional em todas as quatro estratégias.</li>
+                            <li><strong>Significância Estatística:</strong> O teste ANOVA resultou em um valor $F = 11,4741$ com um <span class="highlight-cyan">p-valor de 0.0000</span> ($p < 0.05$). Rejeita-se a hipótese nula de igualdade de médias.</li>
+                            <li><strong>O paradoxo do "Fly & Die":</strong> Nadadores no cluster *Super Agressivo* têm média de tempo final de **337.93s** ($N=99$), muito mais rápido que o *Uniforme* com **435.81s** ($N=624$).</li>
+                            <li><strong>Justificativa Esportiva:</strong> O estilo *Super Agressivo* é de altíssimo risco e demanda energética. Ele só é tentado por nadadores muito velozes nas **eliminatórias** para garantir índices de classificação rápida. Mas, no pódio da **final**, a tática explode e os nadadores sofrem desaceleração crítica.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="graph-container">
+                        <div class="graph-image-wrapper" onclick="openLightbox(this)">
+                            <img src="scripts/anova_tempo_por_estrategia.png" alt="Boxplot ANOVA de Tempos por Estratégia" class="graph-image">
+                        </div>
+                        <div class="graph-label">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                            Gráfico: anova_tempo_por_estrategia.png
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 4: INSIGHT 1 (HEATS VS FINALS) -->
+            <div class="slide">
+                <div class="slide-grid">
+                    <div class="analysis-card">
+                        <h3 class="section-subtitle">
+                            <svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6.18-6.18 4 4L20 9.41 22.29 11.7 22 6z"/></svg>
+                            Transição Tática de Fases
+                        </h3>
+                        
+                        <div class="inquiry-card">
+                            <span class="inquiry-label">Indagação Científica</span>
+                            <p class="inquiry-text">Os nadadores de elite mundial se comportam de forma diferente dependendo da fase (eliminatória vs. final) ou nadam no limite físico o tempo todo?</p>
+                        </div>
+
+                        <ul class="bullet-list">
+                            <li><strong>"Escondendo o Jogo" nas Eliminatórias:</strong> O gráfico mostra que nas eliminatórias (Heats), a taxa de adoção do pacing linear **Uniforme / Estável** e do pacing **Positivo** é extremamente dominante.</li>
+                            <li><strong>Economia Energética Crítica:</strong> Nas eliminatórias, o atleta quer apenas classificar-se na zona de segurança (Gasto Metabólico Mínimo). Um pacing uniforme diminui o estresse de lactato.</li>
+                            <li><strong>A Explosão das Finais:</strong> Na final (Finals), a proporção do pacing **Parabólico (Sprint Final)** se torna majoritária. Os atletas sabem que o pódio é decidido no toque da parede.</li>
+                            <li><strong>Conclusão Analítica:</strong> Há uma mudança tática drástica e deliberada do nadador de elite ao passar de fase, mudando o desenho de sua curva de velocidade de estável para parabólica.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="graph-container">
+                        <div class="graph-image-wrapper" onclick="openLightbox(this)">
+                            <img src="scripts/insight_1_heats_vs_finals.png" alt="Distribuição de Estratégias: Heats vs Finals" class="graph-image">
+                        </div>
+                        <div class="graph-label">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                            Gráfico: insight_1_heats_vs_finals.png
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 5: INSIGHT 2 (GENERO E PACE) -->
+            <div class="slide">
+                <div class="slide-grid">
+                    <div class="analysis-card">
+                        <h3 class="section-subtitle">
+                            <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                            Fisiologia do Gênero no Controle de Fadiga
+                        </h3>
+                        
+                        <div class="inquiry-card">
+                            <span class="inquiry-label">Indagação Científica</span>
+                            <p class="inquiry-text">Homens e mulheres gerenciam as parciais e o ritmo de prova da mesma forma? Quem possui a mecânica de nado mais estável sob fadiga crônica?</p>
+                        </div>
+
+                        <ul class="bullet-list">
+                            <li><strong>Variabilidade de Velocidade Relativa:</strong> Calculamos o desvio padrão da velocidade relativa (%) por atleta para representar a constância de ritmo (quanto menor o desvio, mais estável é o nado).</li>
+                            <li><strong>Estabilidade Feminina Superior:</strong> O violino do gênero feminino (**Women's**) é visivelmente deslocado para baixo e achatado na base inferior da escala de desvio padrão.</li>
+                            <li><strong>Análise Biomecânica / Fisiológica:</strong>
+                                <br>&bull; As mulheres apresentam um limiar de fadiga aeróbica mais controlado.
+                                <br>&bull; Possuem melhor economia de nado decorrente da flutuabilidade hidrodinâmica (maior percentual de gordura essencial e distribuição de centro de massa favorável), resultando em menor perda por arrasto de arranques mecânicos bruscos.
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="graph-container">
+                        <div class="graph-image-wrapper" onclick="openLightbox(this)">
+                            <img src="scripts/insight_2_genero_pacing.png" alt="Violin Plot de Variabilidade por Gênero" class="graph-image">
+                        </div>
+                        <div class="graph-label">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                            Gráfico: insight_2_genero_pacing.png
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 6: INSIGHT 3 (ESCOLAS NACIONAIS) -->
+            <div class="slide">
+                <div class="slide-grid">
+                    <div class="analysis-card">
+                        <h3 class="section-subtitle">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                            Assinaturas Táticas de Treinamento Geopolítico
+                        </h3>
+                        
+                        <div class="inquiry-card">
+                            <span class="inquiry-label">Indagação Científica</span>
+                            <p class="inquiry-text">Existe uma "escola nacional" de pacing? A forma como um nadador lida com a dor e com a energia na prova depende da cultura e metodologia de seu país?</p>
+                        </div>
+
+                        <ul class="bullet-list">
+                            <li><strong>Mapa de Calor de Adoção:</strong> Cruzamos o cluster de pacing dos atletas com as 5 principais potências olímpicas/mundiais: USA, AUS, GBR, CHN e ITA.</li>
+                            <li><strong>Itália (ITA) - Constância Técnica:</strong> Exibe alta taxa de adoção do nado **Uniforme / Estável**. Reflete o estilo clássico italiano de fundo de longa distância (ex: a técnica impecável e metrônomo de Gregorio Paltrinieri).</li>
+                            <li><strong>Austrália (AUS) - Fechamento Explosivo:</strong> Apresenta uma enorme concentração no pacing **Parabólico (Sprint Final)**, evidenciando o foco histórico australiano de dominar os adversários na volta final.</li>
+                            <li><strong>Estados Unidos (USA) - Polivalência Completa:</strong> Apresenta equilíbrio estratégico entre o uniforme e o parabólico, moldando atletas taticamente adaptáveis a qualquer tipo de prova.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="graph-container">
+                        <div class="graph-image-wrapper" onclick="openLightbox(this)">
+                            <img src="scripts/insight_3_escolas_nacionais.png" alt="Heatmap de Escolas Nacionais" class="graph-image">
+                        </div>
+                        <div class="graph-label">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                            Gráfico: insight_3_escolas_nacionais.png
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 7: INSIGHT 4 (CURTA VS LONGA) -->
+            <div class="slide">
+                <div class="slide-grid">
+                    <div class="analysis-card">
+                        <h3 class="section-subtitle">
+                            <svg viewBox="0 0 24 24"><path d="M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21v-2z"/></svg>
+                            O Fator Biomecânico das Viradas e Deslizes
+                        </h3>
+                        
+                        <div class="inquiry-card">
+                            <span class="inquiry-label">Indagação Científica</span>
+                            <p class="inquiry-text">Como a estrutura física de uma Piscina Curta (25m), que dobra o número de viradas de parede, altera a taxa de fadiga metabólica em provas exaustivas como 1500m Livre?</p>
+                        </div>
+
+                        <ul class="bullet-list">
+                            <li><strong>O Efeito das 60 Viradas (Piscina Curta):</strong> Em uma prova de 1500m em piscina curta, o nadador vira na parede 60 vezes (contra apenas 30 vezes na piscina longa de 50m).</li>
+                            <li><strong>Preservação de Velocidade Média:</strong> A curva de velocidade relativa da piscina curta (**Short Course**) mantém-se significativamente mais plana e elevada ao longo de toda a prova.</li>
+                            <li><strong>Explicação Física do Micro-Descanso Ativo:</strong>
+                                <br>&bull; O push-off (empurrão) na parede rígida projeta o corpo do nadador em velocidade superior sem gasto muscular propulsivo dos braços.
+                                <br>&bull; A fase em streamline (deslize subaquático) alivia a fadiga muscular periférica da cintura escapular (braçada), retardando a acidose de lactato e mantendo a velocidade sistêmica.
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="graph-container">
+                        <div class="graph-image-wrapper" onclick="openLightbox(this)">
+                            <img src="scripts/insight_4_curta_vs_longa.png" alt="Curva de Fadiga: Curta vs Longa" class="graph-image">
+                        </div>
+                        <div class="graph-label">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                            Gráfico: insight_4_curta_vs_longa.png
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 8: INSIGHT 5 (ASSINATURA DO OURO) -->
+            <div class="slide">
+                <div class="slide-grid">
+                    <div class="analysis-card">
+                        <h3 class="section-subtitle">
+                            <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                            Capacidade Anaeróbica Residual do Campeão
+                        </h3>
+                        
+                        <div class="inquiry-card">
+                            <span class="inquiry-label">Indagação Científica</span>
+                            <p class="inquiry-text">O que diferencia fisiologicamente e taticamente o medalhista de Ouro (1º) do restante do pódio e finalistas no exato momento final de decisão da prova?</p>
+                        </div>
+
+                        <ul class="bullet-list">
+                            <li><strong>A Última Parcial Decisiva:</strong> Isolamos a velocidade relativa (%) alcançada nos últimos 50 metros da final entre o Campeão (Ouro / 1º), o Pódio (2º e 3º) e os outros Finalistas (4º+).</li>
+                            <li><strong>O Isolamento do Ouro:</strong> Enquanto os nadadores do pódio e finalistas atingem aceleração entre 103% e 105% de suas médias nos últimos 50m, o medalhista de **Ouro** atinge picos de **108% a 110%**.</li>
+                            <li><strong>Reserva Glicolítica Intramuscular:</strong> A assinatura biomecânica do campeão olímpico/mundial é ter uma **maior capacidade anaeróbica residual (glicogênio muscular de emergência)**. Ele consegue reter a capacidade mecânica de contração máxima mesmo sob dor e acidose extrema, disparando um sprint final inalcançável para os oponentes.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="graph-container">
+                        <div class="graph-image-wrapper" onclick="openLightbox(this)">
+                            <img src="scripts/insight_5_assinatura_ouro.png" alt="Boxplot: Sprint Final do Ouro" class="graph-image">
+                        </div>
+                        <div class="graph-label">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                            Gráfico: insight_5_assinatura_ouro.png
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- SLIDE CONTROLS FOOTER -->
+        <footer class="slide-footer-controls">
+            <div class="slide-counter" id="slideCounter">Slide 1 de 9</div>
+            <div class="nav-buttons">
+                <button class="btn-nav" id="prevBtn" onclick="changeSlide(-1)" disabled>
+                    <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                    Anterior
+                </button>
+                <button class="btn-nav" id="nextBtn" onclick="changeSlide(1)">
+                    Próximo
+                    <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                </button>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- LIGHTBOX MODAL -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <img class="lightbox-img" id="lightboxImg" src="" alt="Imagem ampliada">
+    </div>
+
+    <!-- JS PRESENTATION LOGIC -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const slideCounter = document.getElementById('slideCounter');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const slideTitle = document.getElementById('slideTitle');
+        const slideSubtitle = document.getElementById('slideSubtitle');
+        
+        let currentSlide = 0;
+
+        const slideMetaData = [
+            { subtitle: "Trabalho de Conclusão de Curso", title: "Análise de Pacing na Natação" },
+            { subtitle: "Modelagem Matemática", title: "1. Validação do Número de Clusters (K)" },
+            { subtitle: "Inferência Estatística", title: "2. Pacing vs. Medalhas (Qui-Quadrado)" },
+            { subtitle: "Inferência Estatística", title: "3. Análise de Variância (ANOVA)" },
+            { subtitle: "Análise de Dados Avançada", title: "4. Eliminatórias vs. Finais (Heats vs. Finals)" },
+            { subtitle: "Análise de Dados Avançada", title: "5. Gênero e Constância do Ritmo" },
+            { subtitle: "Análise de Dados Avançada", title: "6. Mapa de Calor das Escolas Nacionais" },
+            { subtitle: "Análise de Dados Avançada", title: "7. Curva de Fadiga: Piscina Curta vs. Longa" },
+            { subtitle: "Análise de Dados Avançada", title: "8. A Assinatura do Campeão (Ouro)" }
+        ];
+
+        function goToSlide(index) {
+            // Remove active classes
+            slides[currentSlide].classList.remove('active');
+            navLinks[currentSlide].classList.remove('active');
+            
+            // Set new active slide
+            currentSlide = index;
+            slides[currentSlide].classList.add('active');
+            navLinks[currentSlide].classList.add('active');
+            
+            // Update titles
+            slideSubtitle.innerText = slideMetaData[currentSlide].subtitle;
+            slideTitle.innerText = slideMetaData[currentSlide].title;
+            
+            // Update counter
+            slideCounter.innerText = `Slide ${currentSlide + 1} de ${slides.length}`;
+            
+            // Update button states
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            
+            // Scroll main content to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function changeSlide(direction) {
+            const nextIndex = currentSlide + direction;
+            if (nextIndex >= 0 && nextIndex < slides.length) {
+                goToSlide(nextIndex);
+            }
+        }
+
+        // KEYBOARD NAVIGATION
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowRight' || event.key === ' ') {
+                event.preventDefault();
+                changeSlide(1);
+            } else if (event.key === 'ArrowLeft') {
+                event.preventDefault();
+                changeSlide(-1);
+            }
+        });
+
+        // LIGHTBOX ZOOM FUNCTION
+        function openLightbox(wrapper) {
+            const img = wrapper.querySelector('img');
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightboxImg');
+            
+            lightboxImg.src = img.src;
+            lightbox.style.display = 'flex';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').style.display = 'none';
+        }
+
+        // THEME TOGGLE
+        let currentTheme = "dark";
+        function toggleTheme() {
+            const body = document.body;
+            const themeBtn = document.getElementById('themeBtn');
+            const themeText = document.getElementById('themeText');
+            
+            if (currentTheme === "dark") {
+                body.setAttribute('data-theme', 'light');
+                currentTheme = "light";
+                themeText.innerText = "Modo Escuro";
+            } else {
+                body.removeAttribute('data-theme');
+                currentTheme = "dark";
+                themeText.innerText = "Modo Claro";
+            }
+        }
+
+        // FULLSCREEN IMMERSIVE MODE
+        function toggleFullscreen() {
+            const body = document.body;
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            
+            body.classList.toggle('fullscreen-mode');
+            
+            if (body.classList.contains('fullscreen-mode')) {
+                fullscreenBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+                    Fechar
+                `;
+            } else {
+                fullscreenBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                    Apresentação
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
