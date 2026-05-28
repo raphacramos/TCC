@@ -18,9 +18,12 @@
 * **O que o gráfico mostra:**
   * **Método do Cotovelo (Elbow Curve):** Queda acentuada da inércia (soma dos quadrados internos) que se estabiliza a partir de $K=4$ clusters.
   * **Coeficiente de Silhueta (Silhouette Score):** O Silhouette score mostra $K=2$ com o maior pico (0.327), mas esta divisão é simples demais (ex: rápidos vs. lentos). O segundo pico local ocorre em $K=5$ (0.203), com $K=4$ logo atrás (0.198) — uma diferença marginal de apenas 0,005.
-* **O Dilema de Seleção ($K=4$ vs. $K=5$):**
-  * **Por que K=4 foi preferido?** A escolha de $K=4$ equilibra a otimização matemática com a **interpretabilidade biomecânica**. Na literatura de ciências do esporte (Abbiss & Laursen, 2008), o pacing é tradicionalmente classificado em 4 perfis clássicos (Parabólico, Uniforme, Positivo e Negativo/Fly & Die). Adicionar um 5º cluster traria complexidade desnecessária (subdividindo o grupo *Positivo* em variantes redundantes) sem acrescentar novos comportamentos táticos explicáveis.
-* **Conclusão:** Os nadadores de elite não nadam de forma aleatória; eles adotam 4 assinaturas táticas claras chanceladas pela literatura esportiva e corroboradas pelo "cotovelo" da inércia.
+* **O Dilema de Seleção ($K=4$ vs. $K=5$) e as Estratégias de Abbiss & Laursen (2008):**
+  * **Por que K=4 foi preferido se K=5 tem silhueta ligeiramente maior?** Abbiss & Laursen (2008) descrevem **6 estratégias de pacing no esporte**. Contudo, **duas são inaplicáveis ao meio e longo fundo de piscina**:
+    1. *All-Out Pacing* (exclusivo para sprints curtos < 30s, fisiologicamente impossível em provas longas).
+    2. *Variable Pacing* (usado para combater flutuações ambientais como vento/subidas no ciclismo e águas abertas; a piscina é um ambiente fechado e estritamente controlado).
+  * **Os 4 Perfis Aplicáveis:** Eliminando as duas anteriores, restam exatamente **4 estratégias aplicáveis** às provas de 400m, 800m e 1500m na piscina: *Positivo*, *Uniforme/Estável*, *Parabólico* e *Negativo* (representado pelo *Super Agressivo/Fly & Die*). Portanto, $K=4$ reflete com precisão a literatura teórica aplicável, evitando que $K=5$ crie clusters redundantes (como subdividir o pacing Positivo).
+* **Conclusão:** Os nadadores de elite não nadam de forma aleatória; eles adotam as 4 assinaturas táticas fundamentais chanceladas pela literatura biomecânica aplicável à natação de piscina, o que é corroborado pelo "cotovelo" da curva de inércia.
 
 ---
 
