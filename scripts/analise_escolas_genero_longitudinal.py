@@ -80,7 +80,7 @@ def rodar_novas_analises():
         print("Erro: rode o ETL e o modelo K-Means primeiro.")
         return
         
-    df_perf = df_completo.drop_duplicates(subset=['campeonato', 'tipo_piscina', 'genero', 'distancia_prova', 'fase', 'atleta']).copy()
+    df_perf = df_completo.drop_duplicates(subset=['campeonato', 'tipo_piscina', 'genero', 'distancia_prova', 'fase', 'atleta'], keep='last').copy()
     
     # ------------------------------------------------------------------
     # ANÁLISE 1: SUCESSO DE MEDALHAS POR ESCOLA NACIONAL (Insight 6)
