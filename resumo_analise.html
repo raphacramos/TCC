@@ -779,6 +779,24 @@
                     8. O Segredo do Ouro
                 </a>
             </li>
+            <li>
+                <a href="#insight-6" class="nav-link">
+                    <svg viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v3c0 2.5 1.7 4.6 4 5.2V17c0 1.7 1.3 3 3 3h2v2h-2v2h8v-2h-2v-2h2c1.7 0 3-1.3 3-3v-1.8c2.3-.6 4-2.7 4-5.2V7c0-1.1-.9-2-2-2zM5 10V7h2v3c0 1.2-.4 2.1-1 2.6c-.6-.5-1-1.4-1-2.6zm14 0c0 1.2-.4 2.1-1 2.6c-.6-.5-1-1.4-1-2.6V7h2v3z"/></svg>
+                    9. Escolas & Medalhas
+                </a>
+            </li>
+            <li>
+                <a href="#insight-7" class="nav-link">
+                    <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                    10. Gênero nos Medalhistas
+                </a>
+            </li>
+            <li>
+                <a href="#insight-8" class="nav-link">
+                    <svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6.18-6.18 4 4L20 9.41 22.29 11.7 22 6z"/></svg>
+                    11. Análise Longitudinal
+                </a>
+            </li>
         </nav>
 
         <div class="sidebar-footer">
@@ -1281,9 +1299,131 @@
                     <div class="graph-wrapper" onclick="openLightbox(this)">
                         <img src="scripts/insight_5_assinatura_ouro.png" alt="Boxplot da velocidade relativa na última parcial por colocação">
                     </div>
+                </div>
+            </section>
+
+        <!-- 9. INSIGHT 6: MEDALHAS POR PAÍS -->
+        <section class="report-section" id="insight-6">
+            <div class="section-header">
+                <span class="section-number">9.</span>
+                <h2 class="section-title">Geopolítica da Natação: Sucesso de Medalhas por País</h2>
+            </div>
+            
+            <div class="section-content-grid">
+                <div class="section-text">
+                    <p>Analisamos a distribuição histórica de sucesso competitivo mapeando a contagem absoluta de medalhas (Ouro, Prata e Bronze) conquistadas pelas principais nações no período de 2010 a 2025.</p>
+
+                    <ul class="bullet-list">
+                        <li><strong>Dominância das Escolas Tradicionais:</strong> Os <strong>Estados Unidos (USA)</strong> lideram com folga acumulando <code>69 medalhas</code>, seguidos de perto pela <strong>Itália (ITA)</strong> com <code>56</code>, <strong>Alemanha (GER)</strong> com <code>41</code> e <strong>Austrália (AUS)</strong> com <code>40</code>.</li>
+                        <li><strong>Assinatura de Medalhas:</strong> A Itália demonstra uma força constante em provas de fundo, acumulando um volume massivo de pódios que reflete sua forte escola técnica de resistência e fundistas de altíssimo nível.</li>
+                    </ul>
+
+                    <div class="alert-box tip">
+                        <div class="alert-title">
+                            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            Metodologia de Contagem
+                        </div>
+                        <p>Filtramos apenas atletas finalistas que alcançaram as posições de 1º (Ouro), 2º (Prata) ou 3º (Bronze) em todas as provas consolidadas do dataset, eliminando duplicidades de eliminatórias para obter a representação exata do quadro de medalhas real.</p>
+                    </div>
+                </div>
+                
+                <div class="section-visual">
+                    <div class="graph-wrapper" onclick="openLightbox(this)">
+                        <img src="scripts/insight_6_escolas_medalhas.png" alt="TOP 10 Países por Medalhas (Ouro, Prata, Bronze)">
+                    </div>
                     <div class="graph-caption">
                         <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-                        Clique no gráfico para ampliar (insight_5_assinatura_ouro.png)
+                        Clique no gráfico para ampliar (insight_6_escolas_medalhas.png)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10. INSIGHT 7: PACING DE MEDALHISTAS POR GÊNERO -->
+        <section class="report-section" id="insight-7">
+            <div class="section-header">
+                <span class="section-number">10.</span>
+                <h2 class="section-title">Diferença de Pacing por Gênero entre Medalhistas</h2>
+            </div>
+            
+            <div class="section-content-grid">
+                <div class="section-text">
+                    <p>Cruzamos as estratégias de pacing do K-Means com a distribuição de gênero focando exclusivamente nos atletas medalhistas para avaliar se homens e mulheres sobem ao pódio com as mesmas táticas.</p>
+
+                    <ul class="bullet-list">
+                        <li><strong>Diferenças Táticas Cruciais:</strong>
+                            <div style="font-size: 0.9rem; margin-top:0.25rem;">
+                                &bull; <strong>Medalhistas Homens (Men's):</strong> O pacing <strong>Parabólico (Sprint Final)</strong> é amplamente dominante com <span class="highlight-gold">58,21% de adoção</span>. A tática <strong>Uniforme</strong> representa apenas 23,88%.<br>
+                                &bull; <strong>Medalhistas Mulheres (Women's):</strong> A tática <strong>Uniforme / Estável</strong> é a líder isolada com <span class="highlight-cyan">44,93% de adoção</span>, enquanto a Parabólica cai para 31,88%.
+                            </div>
+                        </li>
+                        <li><strong>Significância Estatística:</strong> O teste de independência do Qui-Quadrado aplicado sobre os medalhistas resultou em $\chi^2 = 26.8589$ com <span class="highlight-cyan">p-valor de 6.08e-05</span> ($p < 0.05$). Rejeita-se vigorosamente a independência de táticas por gênero.</li>
+                    </ul>
+
+                    <div class="alert-box note">
+                        <div class="alert-title">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                            Explicação Fisiológica das Medalhas
+                        </div>
+                        <p>O nado masculino medalhista é fortemente dependente de um sprint final altamente agressivo (anaeróbico alático) na última parcial. Já as mulheres medalhistas baseiam seu sucesso no ritmo constante (endurance aeróbica estável) e na economia mecânica do nado, sofrendo menos flutuações e preservando velocidade em virtude de melhor flutuabilidade hidrodinâmica natural.</p>
+                    </div>
+                </div>
+                
+                <div class="section-visual">
+                    <div class="graph-wrapper" onclick="openLightbox(this)">
+                        <img src="scripts/insight_7_genero_medalhistas_pacing.png" alt="Adoção de Pacing por Gênero entre Medalhistas">
+                    </div>
+                    <div class="graph-caption">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        Clique no gráfico para ampliar (insight_7_genero_medalhistas_pacing.png)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 11. INSIGHT 8: ANÁLISE LONGITUDINAL -->
+        <section class="report-section" id="insight-8">
+            <div class="section-header">
+                <span class="section-number">11.</span>
+                <h2 class="section-title">Análise Longitudinal: Auge de Carreira e Trajetórias de Elite</h2>
+            </div>
+            
+            <div class="section-content-grid">
+                <div class="section-text">
+                    <p>Acompanhamos atletas individualmente através de múltiplos campeonatos ao longo do tempo para responder a indagações críticas sobre sustentação de rendimento.</p>
+
+                    <ul class="bullet-list">
+                        <li><strong>Curva Média de Carreira (Janela de Rendimento):</strong> Alinhando os atletas pelo seu ano de auge (Personal Best = 100%), a curva longitudinal média revela que nadadores de elite conseguem sustentar níveis de altíssima performance (<strong>acima de 98% do PB</strong>) por um período de <strong>4 a 5 anos</strong> após o auge. O declínio fisiológico acentua-se a partir de 6 a 7 anos após o PB.</li>
+                        <li><strong>Evolução Temporal dos Tempos de Prova:</strong> Rastreando atletas lendários nos 1500m Livre (como Gregorio Paltrinieri), observamos a flutuação fina e consistente do tempo anual. A capacidade de reter tempos competitivos constantes por mais de uma década (2012 - 2024) evidencia a consistência dessas trajetórias de elite.</li>
+                    </ul>
+
+                    <div class="alert-box warning">
+                        <div class="alert-title">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                            Volume Amostral
+                        </div>
+                        <p>O estudo longitudinal contou com uma amostragem robusta de <strong>389 atletas recorrentes</strong> com participações em 3 ou mais campeonatos distintos, contendo trajetórias de até 19 competições mapeadas no tempo (como Gregorio Paltrinieri e Henrik Christiansen).</p>
+                    </div>
+                </div>
+                
+                <div class="section-visual" style="gap: 1.5rem;">
+                    <div>
+                        <div class="graph-wrapper" onclick="openLightbox(this)">
+                            <img src="scripts/insight_8_curva_auge_carreira.png" alt="Curva Longitudinal de Rendimento de Carreira">
+                        </div>
+                        <div class="graph-caption">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                            Clique no gráfico para ampliar (insight_8_curva_auge_carreira.png)
+                        </div>
+                    </div>
+                    <div>
+                        <div class="graph-wrapper" onclick="openLightbox(this)">
+                            <img src="scripts/insight_9_trajetorias_individuais.png" alt="Evolução Temporal de Tempos Anuais de Elite">
+                        </div>
+                        <div class="graph-caption">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                            Clique no gráfico para ampliar (insight_9_trajetorias_individuais.png)
+                        </div>
                     </div>
                 </div>
             </div>

@@ -110,3 +110,35 @@
   * O medalhista de **Ouro (1º)** apresenta uma aceleração final estatisticamente superior, alcançando picos entre **108% e 110%** da sua velocidade média global.
   * Medalhistas de Prata/Bronze e finalistas estabilizam entre 103% e 105%.
 * **Explicação Tática:** O campeão olímpico/mundial possui uma **capacidade anaeróbica residual superior**. Ele consegue suportar a acidose muscular nos últimos metros e liberar uma reserva de emergência fisiológica para disparar um sprint final que os adversários não conseguem acompanhar.
+
+---
+
+## Slide 10: Insight 6 - Geopolítica da Natação (Escolas e Medalhas)
+* **Imagem de Referência:** `insight_6_escolas_medalhas.png`
+* **Indagação Científica:** Quais escolas nacionais obtiveram o maior sucesso competitivo em termos de medalhas (Ouro, Prata e Bronze) nas provas de meio e longo fundo no período analisado?
+* **O que o gráfico de barras empilhadas mostra:**
+  * Distribuição absoluta acumulada de medalhas (Ouro, Prata e Bronze) conquistadas pelo TOP 10 de países no dataset.
+  * Os **Estados Unidos (USA)** lideram com folga, somando `69 medalhas`, seguidos de perto pela **Itália (ITA)** com `56 medalhas`, **Alemanha (GER)** com `41` e **Austrália (AUS)** com `40`.
+* **Conclusão:** Existe uma clara hegemonia das escolas tradicionais anglo-saxãs (USA, AUS) combinada com a ascensão e dominância da escola europeia continental de endurance, com destaque para a Itália. O volume expressivo de pódios italianos (56 medalhas) comprova a excelência de sua metodologia de treino focada na constância mecânica e fisiológica no meio e longo fundo.
+
+---
+
+## Slide 11: Insight 7 - Diferença de Pacing por Gênero entre Medalhistas
+* **Imagem de Referência:** `insight_7_genero_medalhistas_pacing.png`
+* **Indagação Científica:** Será que nadadores homens e mulheres medalhistas adotam as mesmas estratégias de pacing para conquistar medalhas, ou existe uma distinção tática baseada no gênero?
+* **O que o gráfico de barras mostra:**
+  * Taxa de adoção (%) de cada estratégia de pacing K-Means, comparando medalhistas masculinos (Men's) versus medalhistas femininos (Women's).
+  * **Medalhistas Homens:** O pacing **Parabólico (Sprint Final)** é amplamente dominante com **58,21% de adoção**, enquanto o Uniforme representa apenas 23,88%.
+  * **Medalhistas Mulheres:** O pacing **Uniforme / Estável** é o mais adotado com **44,93%**, enquanto o Parabólico cai para 31,88%.
+  * **Significância Estatística:** Teste Qui-Quadrado altamente significante ($\chi^2 = 26.8589, p = 6.08 \times 10^{-5}$), rejeitando a independência de táticas por gênero.
+* **Explicação Fisiológica e Biomecânica:** O sucesso dos nadadores masculinos de elite depende fundamentalmente de um sprint final anaeróbico alático extremamente agressivo. Em contrapartida, as mulheres medalhistas baseiam seu sucesso competitivo na constância do ritmo (endurance aeróbica estável) e na economia mecânica do nado, beneficiando-se de menor variabilidade e maior hidrodinâmica natural.
+
+---
+
+## Slide 12: Insight 8 & 9 - Análise Longitudinal (Carreira e Auge)
+* **Imagens de Referência:** `insight_8_curva_auge_carreira.png` e `insight_9_trajetorias_individuais.png`
+* **Indagação Científica:** Quanto tempo um nadador de elite consegue se manter no topo competitivo da natação mundial (auge de carreira)? Como as trajetórias e tempos finais se comportam ao longo dos anos calendários?
+* **O que os gráficos mostram:**
+  * **Curva de Auge de Carreira (Média):** Rastreia 389 atletas recorrentes (com 3+ participações em campeonatos), alinhados pelo ano de seu recorde pessoal (PB = 100%). Revela que nadadores de elite conseguem sustentar alta performance (acima de 98% do PB) por uma janela de **4 a 5 anos** após o ano de auge. O declínio fisiológico médio acentua-se a partir de 6 a 7 anos após o auge.
+  * **Trajetórias Individuais de Elite:** Evolução temporal do melhor tempo anual de prova nos 1500m Livre (Piscina Longa) para Gregorio Paltrinieri (ITA) e Henrik Christiansen (NOR) de 2012 a 2025. Destaca a impressionante resiliência de Paltrinieri mantendo tempos competitivos mundiais por mais de uma década.
+* **Conclusão:** A janela ótima de desempenho máximo de elite nas provas de fundo em natação dura em média meia década. Nadadores lendários conseguem prolongar essa competitividade por mais tempo aliando maturidade fisiológica a uma técnica de nado extremamente eficiente e economia de energia.
