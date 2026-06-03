@@ -215,28 +215,63 @@ def rodar_novas_analises():
     # ANÁLISE 4: TRAJETÓRIAS INDIVIDUAIS DE ELITE (Insight 9)
     # ------------------------------------------------------------------
     print("\n>>> Executando Análise 4: Trajetórias Individuais de Atletas (Insight 9)...")
-    # Vamos focar na prova de 1500m Livre Masculino (Long Course) onde temos lendas como Gregorio Paltrinieri
-    df_1500_long = df_perf_anos[(df_perf_anos['distancia_prova'] == 1500) & (df_perf_anos['tipo_piscina'] == 'Long Course')].copy()
-    df_1500_long['tempo_final_min'] = df_1500_long['tempo_acumulado_seg'] / 60
     
-    # Filtrar o histórico de Gregorio Paltrinieri
-    df_gregorio = df_1500_long[df_1500_long['atleta'].str.contains("PALTRINIERI", na=False)].copy()
-    df_gregorio = df_gregorio.groupby('ano')['tempo_final_min'].min().reset_index() # melhor tempo por ano
+    fig, axs = plt.subplots(2, 2, figsize=(14, 10))
     
-    # Filtrar o histórico de Henrik Christiansen
-    df_henrik = df_1500_long[df_1500_long['atleta'].str.contains("CHRISTIANSEN Henrik", na=False)].copy()
-    df_henrik = df_henrik.groupby('ano')['tempo_final_min'].min().reset_index()
+    def plotar_atleta_eixo(ax, nome_busca, distancia, label, cor, marker):
+        df_sub = df_perf_anos[(df_perf_anos['distancia_prova'] == distancia) & (df_perf_anos['tipo_piscina'] == 'Long Course')].copy()
+        df_ath = df_sub[df_sub['atleta'].str.contains(nome_busca, na=False, case=False)].copy()
+        if not df_ath.empty:
+            df_ath['tempo_final_min'] = df_ath['tempo_acumulado_seg'] / 60
+            df_g = df_ath.groupby('ano')['tempo_final_min'].min().reset_index().sort_values('ano')
+            ax.plot(df_g['ano'], df_g['tempo_final_min'], marker=marker, markersize=6, color=cor, linewidth=2, label=label)
+            return True
+        return False
+
+    # Subplot 1 (Top-Left): 1500m Livre Masculino (Long Course)
+    plotar_atleta_eixo(axs[0, 0], "PALTRINIERI", 1500, "Gregorio Paltrinieri (ITA)", "#2c3e50", "s")
+    plotar_atleta_eixo(axs[0, 0], "ROMANCHUK", 1500, "Mykhailo Romanchuk (UKR)", "#2980b9", "o")
+    plotar_atleta_eixo(axs[0, 0], "WELLBROCK", 1500, "Florian Wellbrock (GER)", "#e67e22", "^")
+    plotar_atleta_eixo(axs[0, 0], "CHRISTIANSEN", 1500, "Henrik Christiansen (NOR)", "#27ae60", "d")
+    axs[0, 0].set_title("1500m Livre Masculino (Long Course)", fontsize=11, fontweight='bold')
+    axs[0, 0].set_ylabel("Melhor Tempo no Ano (Minutos)", fontsize=10)
+    axs[0, 0].legend(fontsize=8)
+    axs[0, 0].grid(True, linestyle=':', alpha=0.6)
+    axs[0, 0].invert_yaxis()  # Inverte eixo Y: mais rápido (menor tempo) no topo!
     
-    # Plotar
-    plt.figure(figsize=(11, 6))
-    plt.plot(df_gregorio['ano'], df_gregorio['tempo_final_min'], marker='s', markersize=6, color='#2c3e50', linewidth=2, label='Gregorio Paltrinieri (ITA)')
-    plt.plot(df_henrik['ano'], df_henrik['tempo_final_min'], marker='o', markersize=6, color='#27ae60', linewidth=2, label='Henrik Christiansen (NOR)')
-    
-    plt.title('Evolução do Tempo de Prova ao Longo dos Anos (1500m Livre L.C.)', fontsize=14, fontweight='bold')
-    plt.xlabel('Ano Calendário', fontsize=11)
-    plt.ylabel('Melhor Tempo no Ano (Minutos)', fontsize=11)
-    plt.legend()
-    plt.grid(True, linestyle=':', alpha=0.7)
+    # Subplot 2 (Top-Right): 1500m Livre Feminino (Long Course)
+    plotar_atleta_eixo(axs[0, 1], "LEDECKY", 1500, "Katie Ledecky (USA)", "#8e44ad", "s")
+    plotar_atleta_eixo(axs[0, 1], "QUADARELLA", 1500, "Simona Quadarella (ITA)", "#c0392b", "o")
+    plotar_atleta_eixo(axs[0, 1], "KOBRICH", 1500, "Kristel Köbrich (CHI)", "#16a085", "^")
+    axs[0, 1].set_title("1500m Livre Feminino (Long Course)", fontsize=11, fontweight='bold')
+    axs[0, 1].set_ylabel("Melhor Tempo no Ano (Minutos)", fontsize=10)
+    axs[0, 1].legend(fontsize=8)
+    axs[0, 1].grid(True, linestyle=':', alpha=0.6)
+    axs[0, 1].invert_yaxis()  # Inverte eixo Y: mais rápido (menor tempo) no topo!
+
+    # Subplot 3 (Bottom-Left): 800m Livre (Long Course)
+    plotar_atleta_eixo(axs[1, 0], "LEDECKY", 800, "Katie Ledecky (USA - Fem)", "#8e44ad", "s")
+    plotar_atleta_eixo(axs[1, 0], "PALTRINIERI", 800, "Gregorio Paltrinieri (ITA - Masc)", "#2c3e50", "o")
+    plotar_atleta_eixo(axs[1, 0], "QUADARELLA", 800, "Simona Quadarella (ITA - Fem)", "#c0392b", "^")
+    axs[1, 0].set_title("800m Livre (Long Course)", fontsize=11, fontweight='bold')
+    axs[1, 0].set_xlabel("Ano Calendário", fontsize=10)
+    axs[1, 0].set_ylabel("Melhor Tempo no Ano (Minutos)", fontsize=10)
+    axs[1, 0].legend(fontsize=8)
+    axs[1, 0].grid(True, linestyle=':', alpha=0.6)
+    axs[1, 0].invert_yaxis()  # Inverte eixo Y: mais rápido (menor tempo) no topo!
+
+    # Subplot 4 (Bottom-Right): 400m Livre (Long Course)
+    plotar_atleta_eixo(axs[1, 1], "SUN Yang", 400, "Sun Yang (CHN - Masc)", "#d35400", "s")
+    plotar_atleta_eixo(axs[1, 1], "TITMUS", 400, "Ariarne Titmus (AUS - Fem)", "#27ae60", "o")
+    plotar_atleta_eixo(axs[1, 1], "LEDECKY", 400, "Katie Ledecky (USA - Fem)", "#8e44ad", "^")
+    axs[1, 1].set_title("400m Livre (Long Course)", fontsize=11, fontweight='bold')
+    axs[1, 1].set_xlabel("Ano Calendário", fontsize=10)
+    axs[1, 1].set_ylabel("Melhor Tempo no Ano (Minutos)", fontsize=10)
+    axs[1, 1].legend(fontsize=8)
+    axs[1, 1].grid(True, linestyle=':', alpha=0.6)
+    axs[1, 1].invert_yaxis()  # Inverte eixo Y: mais rápido (menor tempo) no topo!
+
+    plt.suptitle("Trajetórias Individuais de Elite: Evolução Temporal de Tempos Anuais (2010 - 2025)\n(Eixo Y Invertido: Tempos mais rápidos / melhores aparecem no topo)", fontsize=13, fontweight='bold', y=0.98)
     salvar_grafico('insight_9_trajetorias_individuais.png')
 
     print("\n>>> Pipeline de Expansão de Análises Executado com Sucesso!")

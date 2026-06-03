@@ -137,8 +137,14 @@
 
 ## Slide 12: Insight 8 & 9 - Análise Longitudinal (Carreira e Auge)
 * **Imagens de Referência:** `insight_8_curva_auge_carreira.png` e `insight_9_trajetorias_individuais.png`
-* **Indagação Científica:** Quanto tempo um nadador de elite consegue se manter no topo competitivo da natação mundial (auge de carreira)? Como as trajetórias e tempos finais se comportam ao longo dos anos calendários?
+* **Indagação Científica:** Quanto tempo um nadador de elite consegue se manter no topo competitivo da natação mundial (auge de carreira)? Como as trajetórias individuais e tempos de prova dos maiores atletas de fundo evoluem com o passar dos anos?
 * **O que os gráficos mostram:**
-  * **Curva de Auge de Carreira (Média):** Rastreia 389 atletas recorrentes (com 3+ participações em campeonatos), alinhados pelo ano de seu recorde pessoal (PB = 100%). Revela que nadadores de elite conseguem sustentar alta performance (acima de 98% do PB) por uma janela de **4 a 5 anos** após o ano de auge. O declínio fisiológico médio acentua-se a partir de 6 a 7 anos após o auge.
-  * **Trajetórias Individuais de Elite:** Evolução temporal do melhor tempo anual de prova nos 1500m Livre (Piscina Longa) para Gregorio Paltrinieri (ITA) e Henrik Christiansen (NOR) de 2012 a 2025. Destaca a impressionante resiliência de Paltrinieri mantendo tempos competitivos mundiais por mais de uma década.
-* **Conclusão:** A janela ótima de desempenho máximo de elite nas provas de fundo em natação dura em média meia década. Nadadores lendários conseguem prolongar essa competitividade por mais tempo aliando maturidade fisiológica a uma técnica de nado extremamente eficiente e economia de energia.
+  * **Curva de Auge de Carreira (Média - Slide 8):** Rastreia 389 atletas recorrentes (com 3+ participações) alinhados pelo ano de seu recorde pessoal (PB = 100%). Revela sustentação de alto rendimento (>98% do PB) por **4 a 5 anos** após o auge.
+  * **Trajetórias Individuais de Elite (Slide 9 - Grade 2x2):** Mostra a evolução dos melhores tempos anuais em minutos de supercampeões olímpicos e mundiais nas provas de **400m, 800m e 1500m Livre** (Piscina Longa) desde 2010.
+  * **Entendimento do Eixo Y (Invertido):** Para fins de clareza visual e intuitiva na apresentação, **o eixo Y está invertido**. Como tempos menores significam melhor desempenho, a inversão coloca os **tempos mais rápidos (melhores) no topo** do gráfico e os tempos mais lentos na base. Assim, subidas na linha indicam ganho de performance e descidas indicam declínio ou oscilação.
+  * **Atletas Mapeados na Grade:**
+    * *1500m Masc:* Gregorio Paltrinieri (ITA), Mykhailo Romanchuk (UKR), Florian Wellbrock (GER), Henrik Christiansen (NOR).
+    * *1500m Fem:* Katie Ledecky (USA), Simona Quadarella (ITA), Kristel Köbrich (CHI).
+    * *800m Masc/Fem:* Katie Ledecky (USA), Gregorio Paltrinieri (ITA), Simona Quadarella (ITA).
+    * *400m Masc/Fem:* Sun Yang (CHN), Ariarne Titmus (AUS), Katie Ledecky (USA).
+* **Conclusão:** A janela de performance máxima de elite de um fundista dura cerca de meia década. No entanto, lendas como Katie Ledecky e Gregorio Paltrinieri desafiam a média biológica, mantendo tempos excepcionais no topo mundial por mais de 10 anos. A inversão do eixo Y deixa claro como essas lendas sustentam suas trajetórias lineares bem próximas ao limite superior do gráfico.
