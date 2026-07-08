@@ -3,6 +3,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.cluster import KMeans
+import os
+
+ARTIFACT_DIR = "/Users/raphaelramos/.gemini/antigravity/brain/94b82bc2-5022-49cb-9c5e-04358ac9bab8/artifacts"
+
+def salvar_grafico(filename):
+    plt.tight_layout()
+    plt.savefig(filename, dpi=300)
+    if os.path.exists(ARTIFACT_DIR):
+        artifact_path = os.path.join(ARTIFACT_DIR, filename)
+        plt.savefig(artifact_path, dpi=300)
+        print(f">>> Gráfico salvo em '{filename}' e cópia em '{artifact_path}'")
+    else:
+        print(f">>> Gráfico salvo em '{filename}'")
 
 def rotular_estrategias_dinamicamente(centroides, k):
     """
@@ -129,9 +142,33 @@ def rodar_pipeline_kmeans():
             ax.legend(title='Estratégia Identificada', bbox_to_anchor=(1.02, 1), loc='upper left')
             ax.grid(True, linestyle=':', alpha=0.7)
 
+            # Salvar gráfico individual para o TCC
+            plt.figure(figsize=(8, 5))
+            for c_idx, cluster_id in enumerate(centroides.index):
+                qtd_atletas = sum(df_pivot["Cluster"] == cluster_id)
+                nome_estrategia = mapa_estrategias[cluster_id]
+                sns.lineplot(
+                    x=centroides.columns, 
+                    y=centroides.loc[cluster_id], 
+                    marker='o', 
+                    label=f'{nome_estrategia} (N={qtd_atletas})',
+                    linewidth=2.5,
+                    color=cores[c_idx]
+                )
+            plt.axhline(y=100, color='black', linestyle='--', label='Baseline (100%)', alpha=0.5)
+            plt.title(f'Perfis de Pacing: {dist}m Livre - {tipo}', fontsize=12, fontweight='bold')
+            plt.xlabel('Distância Parcial (m)', fontsize=10)
+            plt.ylabel('Velocidade Relativa (%)', fontsize=10)
+            plt.legend(title='Estratégia Identificada', loc='best', fontsize=9)
+            plt.grid(True, linestyle=':', alpha=0.7)
+            
+            piscina_suffix = "longa" if "long" in tipo.lower() else "curta"
+            filename_individual = f"kmeans_pacing_{dist}m_{piscina_suffix}.png"
+            salvar_grafico(filename_individual)
+            plt.close()
+
     plt.tight_layout()
-    plt.savefig('kmeans_pacing_todas_distancias.png', dpi=300)
-    print("\n>>> Gráfico global salvo em 'kmeans_pacing_todas_distancias.png'")
+    salvar_grafico('kmeans_pacing_todas_distancias.png')
     
     # Exportar os resultados consolidados de todas as distâncias
     if todos_resultados:

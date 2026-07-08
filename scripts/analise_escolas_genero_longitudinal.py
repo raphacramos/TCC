@@ -216,6 +216,56 @@ def rodar_novas_analises():
     # ------------------------------------------------------------------
     print("\n>>> Executando Análise 4: Trajetórias Individuais de Atletas (Insight 9)...")
     
+    # Função auxiliar para gerar e salvar gráficos individuais para o TCC
+    def gerar_e_salvar_individual(distancia, titulo, nome_arquivo, atletas_info):
+        plt.figure(figsize=(8, 5))
+        df_sub = df_perf_anos[(df_perf_anos['distancia_prova'] == distancia) & (df_perf_anos['tipo_piscina'] == 'Long Course')].copy()
+        for nome_busca, label, cor, marker in atletas_info:
+            df_ath = df_sub[df_sub['atleta'].str.contains(nome_busca, na=False, case=False)].copy()
+            if not df_ath.empty:
+                df_ath['tempo_final_min'] = df_ath['tempo_acumulado_seg'] / 60
+                df_g = df_ath.groupby('ano')['tempo_final_min'].min().reset_index().sort_values('ano')
+                plt.plot(df_g['ano'], df_g['tempo_final_min'], marker=marker, markersize=6, color=cor, linewidth=2, label=label)
+        
+        plt.title(titulo, fontsize=12, fontweight='bold')
+        plt.ylabel("Melhor Tempo no Ano (Minutos)", fontsize=11)
+        plt.xlabel("Ano Calendário", fontsize=11)
+        plt.legend(fontsize=9)
+        plt.grid(True, linestyle=':', alpha=0.6)
+        plt.gca().invert_yaxis()
+        salvar_grafico(nome_arquivo)
+
+    # 1. Gerar os 4 gráficos individuais primeiro
+    atletas_1500m_masc = [
+        ("PALTRINIERI", "Gregorio Paltrinieri (ITA)", "#2c3e50", "s"),
+        ("ROMANCHUK", "Mykhailo Romanchuk (UKR)", "#2980b9", "o"),
+        ("WELLBROCK", "Florian Wellbrock (GER)", "#e67e22", "^"),
+        ("CHRISTIANSEN", "Henrik Christiansen (NOR)", "#27ae60", "d")
+    ]
+    gerar_e_salvar_individual(1500, "Trajetória Individual: 1500m Livre Masculino (Long Course)", "insight_9a_trajetoria_1500m_masc.png", atletas_1500m_masc)
+
+    atletas_1500m_fem = [
+        ("LEDECKY", "Katie Ledecky (USA)", "#8e44ad", "s"),
+        ("QUADARELLA", "Simona Quadarella (ITA)", "#c0392b", "o"),
+        ("KOBRICH", "Kristel Köbrich (CHI)", "#16a085", "^")
+    ]
+    gerar_e_salvar_individual(1500, "Trajetória Individual: 1500m Livre Feminino (Long Course)", "insight_9b_trajetoria_1500m_fem.png", atletas_1500m_fem)
+
+    atletas_800m = [
+        ("LEDECKY", "Katie Ledecky (USA - Fem)", "#8e44ad", "s"),
+        ("PALTRINIERI", "Gregorio Paltrinieri (ITA - Masc)", "#2c3e50", "o"),
+        ("QUADARELLA", "Simona Quadarella (ITA - Fem)", "#c0392b", "^")
+    ]
+    gerar_e_salvar_individual(800, "Trajetória Individual: 800m Livre (Long Course)", "insight_9c_trajetoria_800m.png", atletas_800m)
+
+    atletas_400m = [
+        ("SUN Yang", "Sun Yang (CHN - Masc)", "#d35400", "s"),
+        ("TITMUS", "Ariarne Titmus (AUS - Fem)", "#27ae60", "o"),
+        ("LEDECKY", "Katie Ledecky (USA - Fem)", "#8e44ad", "^")
+    ]
+    gerar_e_salvar_individual(400, "Trajetória Individual: 400m Livre (Long Course)", "insight_9d_trajetoria_400m.png", atletas_400m)
+
+    # 2. Gerar o gráfico em grade (combined panel) para manter compatibilidade com o relatório HTML
     fig, axs = plt.subplots(2, 2, figsize=(14, 10))
     
     def plotar_atleta_eixo(ax, nome_busca, distancia, label, cor, marker):
@@ -237,7 +287,7 @@ def rodar_novas_analises():
     axs[0, 0].set_ylabel("Melhor Tempo no Ano (Minutos)", fontsize=10)
     axs[0, 0].legend(fontsize=8)
     axs[0, 0].grid(True, linestyle=':', alpha=0.6)
-    axs[0, 0].invert_yaxis()  # Inverte eixo Y: mais rápido (menor tempo) no topo!
+    axs[0, 0].invert_yaxis()
     
     # Subplot 2 (Top-Right): 1500m Livre Feminino (Long Course)
     plotar_atleta_eixo(axs[0, 1], "LEDECKY", 1500, "Katie Ledecky (USA)", "#8e44ad", "s")
@@ -247,7 +297,7 @@ def rodar_novas_analises():
     axs[0, 1].set_ylabel("Melhor Tempo no Ano (Minutos)", fontsize=10)
     axs[0, 1].legend(fontsize=8)
     axs[0, 1].grid(True, linestyle=':', alpha=0.6)
-    axs[0, 1].invert_yaxis()  # Inverte eixo Y: mais rápido (menor tempo) no topo!
+    axs[0, 1].invert_yaxis()
 
     # Subplot 3 (Bottom-Left): 800m Livre (Long Course)
     plotar_atleta_eixo(axs[1, 0], "LEDECKY", 800, "Katie Ledecky (USA - Fem)", "#8e44ad", "s")
@@ -258,7 +308,7 @@ def rodar_novas_analises():
     axs[1, 0].set_ylabel("Melhor Tempo no Ano (Minutos)", fontsize=10)
     axs[1, 0].legend(fontsize=8)
     axs[1, 0].grid(True, linestyle=':', alpha=0.6)
-    axs[1, 0].invert_yaxis()  # Inverte eixo Y: mais rápido (menor tempo) no topo!
+    axs[1, 0].invert_yaxis()
 
     # Subplot 4 (Bottom-Right): 400m Livre (Long Course)
     plotar_atleta_eixo(axs[1, 1], "SUN Yang", 400, "Sun Yang (CHN - Masc)", "#d35400", "s")
@@ -269,7 +319,7 @@ def rodar_novas_analises():
     axs[1, 1].set_ylabel("Melhor Tempo no Ano (Minutos)", fontsize=10)
     axs[1, 1].legend(fontsize=8)
     axs[1, 1].grid(True, linestyle=':', alpha=0.6)
-    axs[1, 1].invert_yaxis()  # Inverte eixo Y: mais rápido (menor tempo) no topo!
+    axs[1, 1].invert_yaxis()
 
     plt.suptitle("Trajetórias Individuais de Elite: Evolução Temporal de Tempos Anuais (2010 - 2025)\n(Eixo Y Invertido: Tempos mais rápidos / melhores aparecem no topo)", fontsize=13, fontweight='bold', y=0.98)
     salvar_grafico('insight_9_trajetorias_individuais.png')
